@@ -4,7 +4,7 @@ import ErrorHandler from './utils/ErrorHandler.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import bodyParser from 'body-parser';
-import fileUpload from 'express-fileupload';
+
 
 const app = express();
 
@@ -21,8 +21,6 @@ app.use("/test", (req, res) => {
 });
 
 app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
-
-app.use(fileUpload({useTempFiles: true}))
 
 
 // config
