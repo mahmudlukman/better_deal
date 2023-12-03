@@ -3,6 +3,8 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
 import { RxAvatar } from "react-icons/rx";
+import axios from 'axios'
+import { server } from "../../server";
 
 const Singup = () => {
   const [email, setEmail] = useState("");
@@ -11,13 +13,15 @@ const Singup = () => {
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
 
-  const handleSubmit = () => {
-    console.log('ffff')
-  }
-
   const handleFileInputChange = (e) => {
     const file = e.target.files[0]
     setAvatar(file)
+  }
+
+  const handleSubmit = () => {
+    
+
+    axios.post(`${server}/user/create-user`)
   }
 
   return (

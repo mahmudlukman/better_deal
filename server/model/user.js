@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import mongoose  from "mongoose";
+import bcrypt  from "bcrypt";
+import jwt  from "jsonwebtoken";
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name:{
     type: String,
     required: [true, "Please enter your name!"],
@@ -82,9 +82,9 @@ userSchema.methods.getJwtToken = function () {
 };
 
 // compare password
-UserSchema.methods.comparePassword = async function (enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", userSchema);
 export default User
