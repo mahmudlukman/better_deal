@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import User from "../model/user";
 import Shop from "../model/shop";
 
-exports.isAuthenticated = catchAsyncErrors(async(req,res,next) => {
+export const  isAuthenticated = catchAsyncErrors(async(req,res,next) => {
     const {token} = req.cookies;
 
     if(!token){
@@ -19,7 +19,7 @@ exports.isAuthenticated = catchAsyncErrors(async(req,res,next) => {
 });
 
 
-exports.isSeller = catchAsyncErrors(async(req,res,next) => {
+export const isSeller = catchAsyncErrors(async(req,res,next) => {
     const {seller_token} = req.cookies;
     if(!seller_token){
         return next(new ErrorHandler("Please login to continue", 401));
@@ -33,7 +33,7 @@ exports.isSeller = catchAsyncErrors(async(req,res,next) => {
 });
 
 
-exports.isAdmin = (...roles) => {
+export const isAdmin = (...roles) => {
     return (req,res,next) => {
         if(!roles.includes(req.user.role)){
             return next(new ErrorHandler(`${req.user.role} can not access this resources!`))
