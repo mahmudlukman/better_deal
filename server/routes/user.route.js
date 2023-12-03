@@ -41,7 +41,7 @@ userRouter.get(
   findAllUsers
 );
 userRouter.get('/logout', logout);
-userRouter.get('/getUser', isAuthenticated, getUser);
+userRouter.get('/getuser', isAuthenticated, getUser);
 userRouter.patch('/update-user-info', isAuthenticated, updateUserInfo);
 userRouter.patch('/update-avatar', isAuthenticated, updateAvatar);
 userRouter.patch(

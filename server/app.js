@@ -1,10 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import ErrorHandler from './utils/ErrorHandler.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import userRouter from './routes/user.route.js';
+import errorMiddleware from './middleware/error.js';
 
 const app = express();
 
@@ -12,7 +12,10 @@ const app = express();
 //   origin: ['https://eshop-tutorial-pyri.vercel.app',],
 //   credentials: true
 // }));
-app.use(cors());
+app.use(cors({
+  origin: ['https://localhost:3000',],
+  credentials: true
+}));
 
 app.use(express.json());
 app.use(cookieParser());
@@ -23,7 +26,7 @@ app.use('/test', (req, res) => {
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
-app.use('api/v1/user', userRouter);
+app.use('api/v2/user', userRouter);
 
 // config
 if (process.env.NODE_ENV !== 'PRODUCTION') {
@@ -33,5 +36,5 @@ if (process.env.NODE_ENV !== 'PRODUCTION') {
 }
 
 // it's for ErrorHandling
-app.use(ErrorHandler);
+app.use(errorMiddleware);
 export default app;

@@ -1,10 +1,10 @@
 import User from '../model/user.js';
 import jwt from 'jsonwebtoken';
-import catchAsyncErrors from '../middleware/catchAsyncErrors';
+import catchAsyncErrors from '../middleware/catchAsyncErrors.js';
 import cloudinary from 'cloudinary';
 import ErrorHandler from '../utils/ErrorHandler.js';
-import sendMail from '../utils/sendMail';
-import sendToken from '../utils/jwtToken';
+import sendMail from '../utils/sendMail.js';
+import sendToken from '../utils/jwtToken.js';
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   try {
