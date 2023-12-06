@@ -1,6 +1,7 @@
 import app from "./app.js";
-import dotenv from 'dotenv'
 import connectDatabase from "./db/database.js";
+import {v2 as cloudinary} from "cloudinary";
+import dotenv from 'dotenv';
 
 // Handling uncaught Exception
 process.on("uncaughtException", (err) => {
@@ -16,6 +17,12 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 }
 
 connectDatabase()
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY
+})
 
 // create server
 const server = app.listen(process.env.PORT, () => {

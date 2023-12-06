@@ -6,7 +6,7 @@ import ErrorHandler from '../utils/ErrorHandler.js';
 import sendMail from '../utils/sendMail.js';
 import sendToken from '../utils/jwtToken.js';
 
-export const register = catchAsyncErrors(async (req, res, next) => {
+export const createUser = catchAsyncErrors(async (req, res, next) => {
   try {
     const { name, email, password, avatar } = req.body;
     const userEmail = await User.findOne({ email });

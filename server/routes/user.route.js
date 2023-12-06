@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   activateUser,
+  createUser,
   deleteUser,
   deleteUsers,
   findAllUsers,
@@ -8,7 +9,6 @@ import {
   getUser,
   loginUser,
   logout,
-  register,
   updateAvatar,
   updateUserAddresses,
   updateUserInfo,
@@ -18,7 +18,7 @@ import { isAdmin, isAuthenticated } from '../middleware/auth.js';
 
 const userRouter = express.Router();
 
-userRouter.post('/register', register);
+userRouter.post('/create-user', createUser);
 userRouter.post('/activation', activateUser);
 userRouter.post('/login-user', loginUser);
 userRouter.get('/user-info/:id', findUser);
@@ -33,12 +33,6 @@ userRouter.delete(
   isAuthenticated,
   isAdmin('Admin'),
   deleteUsers
-);
-userRouter.get(
-  '/admin-all-users',
-  isAuthenticated,
-  isAdmin('Admin'),
-  findAllUsers
 );
 userRouter.get('/logout', logout);
 userRouter.get('/getuser', isAuthenticated, getUser);
