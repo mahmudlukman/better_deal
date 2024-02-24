@@ -7,6 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# next.js
+client/.next/
+client/out/
+
 client/node_modules
 server/node_modules
 client/.env

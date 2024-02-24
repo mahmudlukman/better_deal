@@ -35,7 +35,7 @@ userRouter.delete(
   deleteUsers
 );
 userRouter.get('/logout', logout);
-userRouter.get('/getuser', isAuthenticated, getUser);
+userRouter.get('/get-user', isAuthenticated, getUser);
 userRouter.patch('/update-user-info', isAuthenticated, updateUserInfo);
 userRouter.patch('/update-avatar', isAuthenticated, updateAvatar);
 userRouter.patch(
