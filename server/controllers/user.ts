@@ -1,6 +1,5 @@
 require('dotenv').config();
 import { NextFunction, Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
 import ejs from 'ejs';
 import path from 'path';
@@ -184,39 +183,66 @@ export const logoutUser = catchAsyncError(
   }
 );
 
-// // update user info
-// export const updateUserInfo = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     const { email, password, phoneNumber, name } = req.body;
+// update access token
+export const updateAccessToken = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refresh_token = req.cookies.refresh_token as string;
+      const decoded = jwt.verify(
+        refresh_token,
+        process.env.REFRESH_TOKEN as string
+      ) as JwtPayload;
 
-//     const user = await User.findOne({ email }).select('+password');
+      const message = 'Could not refresh token';
+      if (!decoded) {
+        return next(new ErrorHandler(message, 400));
+      }
+      const session = await redis.get(decoded.id as string);
 
-//     if (!user) {
-//       return next(new ErrorHandler('User not found', 400));
-//     }
+      if (!session) {
+        return next(
+          new ErrorHandler('Please login to access this resource', 400)
+        );
+      }
+      const user = JSON.parse(session);
 
-//     const isPasswordValid = await user.comparePassword(password);
+      const accessToken = jwt.sign(
+        { id: user._id },
+        process.env.ACCESS_TOKEN as string,
+        { expiresIn: '5m' }
+      );
 
-//     if (!isPasswordValid) {
-//       return next(
-//         new ErrorHandler('Please provide the correct information', 400)
-//       );
-//     }
+      const refreshToken = jwt.sign(
+        { id: user._id },
+        process.env.REFRESH_TOKEN as string,
+        { expiresIn: '3d' }
+      );
 
-//     user.name = name;
-//     user.email = email;
-//     user.phoneNumber = phoneNumber;
+      req.user = user;
 
-//     await user.save();
+      res.cookie('access_token', accessToken, accessTokenOptions);
+      res.cookie('refresh_token', refreshToken, refreshTokenOptions);
 
-//     res.status(201).json({
-//       success: true,
-//       user,
-//     });
-//   } catch (error) {
-//     return next(new ErrorHandler(error.message, 500));
-//   }
-// });
+      await redis.set(user._id, JSON.stringify(user), 'EX', 604800); // 7 days
+
+      next();
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// get user info
+export const getUserInfo = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+      getUserById(userId, res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 // // update user avatar
 // export const updateAvatar = catchAsyncErrors(async (req, res, next) => {
