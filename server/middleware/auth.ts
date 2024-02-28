@@ -38,20 +38,22 @@ export const isAuthenticated = catchAsyncError(
   }
 );
 
-// exports.isSeller = catchAsyncError(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const { seller_token } = req.cookies;
-//     if (!seller_token) {
-//       return next(new ErrorHandler('Please login to continue', 401));
+// export const isSeller = (...roles: string[]) => {
+//   (
+//     async (req: Request, res: Response, next: NextFunction) => {
+//       const { seller_token } = req.cookies;
+//       if (!seller_token) {
+//         return next(new ErrorHandler('Please login to continue', 401));
+//       }
+  
+//       const decoded = jwt.verify(seller_token, process.env.JWT_SECRET_KEY);
+  
+//       req.seller = await Shop.findById(decoded.id);
+  
+//       next();
 //     }
-
-//     const decoded = jwt.verify(seller_token, process.env.JWT_SECRET_KEY);
-
-//     req.seller = await Shop.findById(decoded.id);
-
-//     next();
-//   }
-// );
+//   );
+// }
 
 // validate user role
 export const authorizeRoles = (...roles: string[]) => {

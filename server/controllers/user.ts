@@ -137,34 +137,36 @@ export const activateUser = catchAsyncError(
   }
 );
 
-// login user
-// export const loginUser = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     const { email, password } = req.body;
+// Login user
+interface ILoginRequest {
+  email: string;
+  password: string;
+}
 
-//     if (!email || !password) {
-//       return next(new ErrorHandler('Please provide the all fields!', 400));
-//     }
+export const loginUser = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body as ILoginRequest;
 
-//     const user = await User.findOne({ email }).select('+password');
+      if (!email || !password) {
+        return next(new ErrorHandler('Please enter email and password', 400));
+      }
+      const user = await UserModel.findOne({ email }).select('+password');
 
-//     if (!user) {
-//       return next(new ErrorHandler("User doesn't exists!", 400));
-//     }
+      if (!user) {
+        return next(new ErrorHandler('Invalid credentials', 400));
+      }
 
-//     const isPasswordValid = await user.comparePassword(password);
-
-//     if (!isPasswordValid) {
-//       return next(
-//         new ErrorHandler('Please provide the correct information', 400)
-//       );
-//     }
-
-//     sendToken(user, 201, res);
-//   } catch (error) {
-//     return next(new ErrorHandler(error.message, 500));
-//   }
-// });
+      const isPasswordMatch = await user.comparePassword(password);
+      if (!isPasswordMatch) {
+        return next(new ErrorHandler('Invalid credentials', 400));
+      }
+      sendToken(user, 200, res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 // // load user
 // export const getUser = catchAsyncErrors(async (req, res, next) => {
