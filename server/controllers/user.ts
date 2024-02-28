@@ -168,41 +168,21 @@ export const loginUser = catchAsyncError(
   }
 );
 
-// // load user
-// export const getUser = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     const user = await User.findById(req.user.id);
-
-//     if (!user) {
-//       return next(new ErrorHandler("User doesn't exists", 400));
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       user,
-//     });
-//   } catch (error) {
-//     return next(new ErrorHandler(error.message, 500));
-//   }
-// });
-
-// // log out user
-// export const logout = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     res.cookie('token', null, {
-//       expires: new Date(Date.now()),
-//       httpOnly: true,
-//       sameSite: 'none',
-//       secure: true,
-//     });
-//     res.status(201).json({
-//       success: true,
-//       message: 'Log out successful!',
-//     });
-//   } catch (error) {
-//     return next(new ErrorHandler(error.message, 500));
-//   }
-// });
+export const logoutUser = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.cookie('access_token', '', { maxAge: 1 });
+      res.cookie('refresh_token', '', { maxAge: 1 });
+      const userId = req.user?._id || '';
+      redis.del(userId);
+      res
+        .status(200)
+        .json({ success: true, message: 'Logged out successfully' });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 // // update user info
 // export const updateUserInfo = catchAsyncErrors(async (req, res, next) => {
