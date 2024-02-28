@@ -59,6 +59,7 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Please enter your email!'],
+      unique: true
     },
     password: {
       type: String,
@@ -75,20 +76,14 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
       default: 'user',
     },
     avatar: {
-      public_id: {
-        type: String,
-        required: true,
-      },
-      url: {
-        type: String,
-        required: true,
+      public_id: String,
+      url: String,
       },
       isVerified: {
         type: Boolean,
         default: false,
       },
     },
-  },
   { timestamps: true }
 );
 
