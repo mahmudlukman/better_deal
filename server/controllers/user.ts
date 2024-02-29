@@ -245,36 +245,45 @@ export const getUserInfo = catchAsyncError(
   }
 );
 
-// // update user avatar
-// export const updateAvatar = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     let existsUser = await User.findById(req.user.id);
-//     if (req.body.avatar !== '') {
-//       const imageId = existsUser.avatar.public_id;
+// update user info
+interface IUpdateUserInfo {
+  name?: string;
+  phoneNumber?: number;
+}
 
-//       await cloudinary.v2.uploader.destroy(imageId);
+export const updateUserInfo = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { name, phoneNumber } = req.body as IUpdateUserInfo;
+      const userId = req.user?._id;
+      const user = await UserModel.findById(userId);
 
-//       const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
-//         folder: 'avatars',
-//         width: 150,
-//       });
+      // if (email && user) {
+      //   const isEmailExist = await UserModel.findOne({ email });
+      //   if (isEmailExist) {
+      //     return next(new ErrorHandler('Email already exist', 400));
+      //   }
+      //   user.email = email;
+      // }
 
-//       existsUser.avatar = {
-//         public_id: myCloud.public_id,
-//         url: myCloud.secure_url,
-//       };
-//     }
+      if (name && user) {
+        user.name = name;
+      }
 
-//     await existsUser.save();
+      if (phoneNumber && user) {
+        user.phoneNumber = phoneNumber;
+      }
 
-//     res.status(200).json({
-//       success: true,
-//       user: existsUser,
-//     });
-//   } catch (error) {
-//     return next(new ErrorHandler(error.message, 500));
-//   }
-// });
+      await user?.save();
+
+      await redis.set(userId, JSON.stringify(user));
+
+      res.status(201).json({ success: true, user });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 // // update user addresses
 // export const updateUserAddresses = catchAsyncErrors(async (req, res, next) => {

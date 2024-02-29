@@ -59,7 +59,7 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Please enter your email!'],
-      unique: true
+      unique: true,
     },
     password: {
       type: String,
@@ -78,18 +78,18 @@ const UserSchema: Schema<IUser> = new mongoose.Schema(
     avatar: {
       public_id: String,
       url: String,
-      },
-      isVerified: {
-        type: Boolean,
-        default: false,
-      },
     },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+  },
   { timestamps: true }
 );
 
 // Hash Password before saving
-UserSchema.pre<IUser>("save", async function (next) {
-  if (!this.isModified("password")) {
+UserSchema.pre<IUser>('save', async function (next) {
+  if (!this.isModified('password')) {
     next();
   }
   this.password = await bcrypt.hash(this.password, 10);
@@ -98,15 +98,15 @@ UserSchema.pre<IUser>("save", async function (next) {
 
 // sign access token
 UserSchema.methods.SignAccessToken = function () {
-  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || "", {
-    expiresIn: "5m",
+  return jwt.sign({ id: this._id }, process.env.ACCESS_TOKEN || '', {
+    expiresIn: '5m',
   });
 };
 
 // sign refresh token
 UserSchema.methods.SignRefreshToken = function () {
-  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || "", {
-    expiresIn: "3d",
+  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN || '', {
+    expiresIn: '3d',
   });
 };
 
@@ -117,5 +117,5 @@ UserSchema.methods.comparePassword = async function (
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const UserModel: Model<IUser> = mongoose.model("User", UserSchema);
+const UserModel: Model<IUser> = mongoose.model('User', UserSchema);
 export default UserModel;

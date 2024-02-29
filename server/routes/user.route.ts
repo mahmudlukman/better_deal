@@ -6,6 +6,7 @@ import {
   logoutUser,
   registerUser,
   updateAccessToken,
+  updateUserInfo,
 } from '../controllers/user';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 
@@ -17,5 +18,10 @@ userRouter.post('/login', loginUser);
 userRouter.get('/logout', isAuthenticated, logoutUser);
 userRouter.get('/refresh', isAuthenticated, updateAccessToken);
 userRouter.get('/me', isAuthenticated, getUserInfo);
+userRouter.put(
+  '/update-user-info',
+  isAuthenticated,
+  updateUserInfo
+);
 
 export default userRouter;
