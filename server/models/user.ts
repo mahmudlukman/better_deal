@@ -21,6 +21,7 @@ export interface IUser extends Document {
 }
 
 interface IAddress {
+  _id: any;
   country: string;
   city: string;
   address1: string;

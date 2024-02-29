@@ -8,6 +8,7 @@ import {
   updateAccessToken,
   updatePassword,
   updateProfilePicture,
+  updateUserAddress,
   updateUserInfo,
 } from '../controllers/user';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
@@ -23,5 +24,6 @@ userRouter.get('/me', isAuthenticated, getUserInfo);
 userRouter.put('/update-user-info', isAuthenticated, updateUserInfo);
 userRouter.put('/update-user-password', isAuthenticated, updatePassword);
 userRouter.put('/update-user-avatar', isAuthenticated, updateProfilePicture);
+userRouter.put('/update-user-address', isAuthenticated, updateUserAddress);
 
 export default userRouter;

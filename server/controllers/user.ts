@@ -377,6 +377,45 @@ export const updateProfilePicture = catchAsyncError(
   }
 );
 
+export const updateUserAddress = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+
+      const user = await UserModel.findById(userId);
+
+      const sameTypeAddress = user?.addresses.find(
+        (address) => address.addressType === req.body.addressType
+      );
+      if (sameTypeAddress) {
+        return next(
+          new ErrorHandler(`${req.body.addressType} address already exists`, 400)
+        );
+      }
+
+      const existsAddress = user?.addresses.find(
+        (address) => address._id === req.body._id
+      );
+
+      if (existsAddress) {
+        Object.assign(existsAddress, req.body);
+      } else {
+        // add the new address to the array
+        user?.addresses.push(req.body);
+      }
+
+      await user?.save();
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 // // delete user address
 // export const deleteUser = catchAsyncErrors(async (req, res, next) => {
 //   try {
