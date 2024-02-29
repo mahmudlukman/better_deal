@@ -377,6 +377,7 @@ export const updateProfilePicture = catchAsyncError(
   }
 );
 
+// update user address
 export const updateUserAddress = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -389,7 +390,10 @@ export const updateUserAddress = catchAsyncError(
       );
       if (sameTypeAddress) {
         return next(
-          new ErrorHandler(`${req.body.addressType} address already exists`, 400)
+          new ErrorHandler(
+            `${req.body.addressType} address already exists`,
+            400
+          )
         );
       }
 
@@ -410,6 +414,30 @@ export const updateUserAddress = catchAsyncError(
         success: true,
         user,
       });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// update user address
+export const deleteUserAddress = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+      const addressId = req.params.id;
+
+      await UserModel.updateOne(
+        {
+          _id: userId,
+        },
+        { $pull: { addresses: { _id: addressId } } }
+      );
+
+      const user = await UserModel.findById(userId);
+      await redis.del(userId);
+
+      res.status(200).json({ success: true, user });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
