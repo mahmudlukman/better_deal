@@ -19,6 +19,7 @@ import cloudinary from 'cloudinary';
 import ErrorHandler from '../utils/ErrorHandler';
 import { catchAsyncError } from '../middleware/catchAsyncErrors';
 import UserModel, { IUser } from '../models/user';
+import user from '../models/user';
 
 // register user
 interface IRegistrationBody {
@@ -285,41 +286,96 @@ export const updateUserInfo = catchAsyncError(
   }
 );
 
-// // update user addresses
-// export const updateUserAddresses = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     const user = await User.findById(req.user.id);
+// update user password
+interface IUpdatePassword {
+  oldPassword: string;
+  newPassword: string;
+}
 
-//     const sameTypeAddress = user.addresses.find(
-//       (address) => address.addressType === req.body.addressType
-//     );
-//     if (sameTypeAddress) {
-//       return next(
-//         new ErrorHandler(`${req.body.addressType} address already exists`)
-//       );
-//     }
+export const updatePassword = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { oldPassword, newPassword } = req.body as IUpdatePassword;
 
-//     const existsAddress = user.addresses.find(
-//       (address) => address._id === req.body._id
-//     );
+      if (!oldPassword || !newPassword) {
+        return next(new ErrorHandler('Please enter old and new password', 400));
+      }
 
-//     if (existsAddress) {
-//       Object.assign(existsAddress, req.body);
-//     } else {
-//       // add the new address to the array
-//       user.addresses.push(req.body);
-//     }
+      const user = await UserModel.findById(req.user?._id).select('+password');
 
-//     await user.save();
+      if (user?.password === undefined) {
+        return next(new ErrorHandler('Invalid user', 400));
+      }
 
-//     res.status(200).json({
-//       success: true,
-//       user,
-//     });
-//   } catch (error) {
-//     return next(new ErrorHandler(error.message, 500));
-//   }
-// });
+      const isPasswordMatch = await user?.comparePassword(oldPassword);
+
+      if (!isPasswordMatch) {
+        return next(new ErrorHandler('Invalid old password', 400));
+      }
+
+      user.password = newPassword;
+
+      await user.save();
+
+      await redis.set(req.user?._id, JSON.stringify(user));
+
+      res.status(201).json({ success: true, user });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// update user profile picture
+interface IUpdateProfilePicture {
+  avatar: string;
+}
+
+export const updateProfilePicture = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { avatar } = req.body as IUpdateProfilePicture;
+
+      const userId = req.user?._id;
+
+      const user = await UserModel.findById(userId);
+
+      if (avatar && user) {
+        // if user have one avatar then call this if
+        if (user?.avatar?.public_id) {
+          // first delete the old image
+          await cloudinary.v2.uploader.destroy(user?.avatar?.public_id);
+
+          const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: 'avatars',
+            width: 150,
+          });
+          user.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        } else {
+          const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: 'avatars',
+            width: 150,
+          });
+          user.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        }
+      }
+
+      await user?.save();
+
+      await redis.set(userId, JSON.stringify(user));
+
+      res.status(200).json({ success: true, user });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 // // delete user address
 // export const deleteUser = catchAsyncErrors(async (req, res, next) => {
