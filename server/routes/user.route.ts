@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   activateUser,
+  deleteUser,
   deleteUserAddress,
   getAllUsers,
   getUserInfo,
@@ -23,9 +24,24 @@ userRouter.post('/login', loginUser);
 userRouter.get('/logout', isAuthenticated, logoutUser);
 userRouter.get('/refresh', isAuthenticated, updateAccessToken);
 userRouter.get('/me', isAuthenticated, getUserInfo);
-userRouter.put('/update-user-info', isAuthenticated, updateUserInfo);
-userRouter.put('/update-user-password', isAuthenticated, updatePassword);
-userRouter.put('/update-user-avatar', isAuthenticated, updateProfilePicture);
+userRouter.put(
+  '/update-user-info',
+  updateAccessToken,
+  isAuthenticated,
+  updateUserInfo
+);
+userRouter.put(
+  '/update-user-password',
+  updateAccessToken,
+  isAuthenticated,
+  updatePassword
+);
+userRouter.put(
+  '/update-user-avatar',
+  isAuthenticated,
+  updateAccessToken,
+  updateProfilePicture
+);
 userRouter.put('/update-user-address', isAuthenticated, updateUserAddress);
 userRouter.delete(
   '/delete-user-address/:id',
@@ -37,6 +53,20 @@ userRouter.get(
   isAuthenticated,
   authorizeRoles('admin'),
   getAllUsers
+);
+userRouter.put(
+  '/update-user-role',
+  isAuthenticated,
+  // authorizeRoles('admin'),
+  getAllUsers
+);
+
+userRouter.delete(
+  '/delete-user/:id',
+  updateAccessToken,
+  isAuthenticated,
+  authorizeRoles('admin'),
+  deleteUser
 );
 
 export default userRouter;
