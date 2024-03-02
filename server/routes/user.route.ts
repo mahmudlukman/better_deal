@@ -13,6 +13,7 @@ import {
   updateProfilePicture,
   updateUserAddress,
   updateUserInfo,
+  updateUserRole,
 } from '../controllers/user';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 
@@ -57,8 +58,8 @@ userRouter.get(
 userRouter.put(
   '/update-user-role',
   isAuthenticated,
-  // authorizeRoles('admin'),
-  getAllUsers
+  authorizeRoles('admin'),
+  updateUserRole
 );
 
 userRouter.delete(
