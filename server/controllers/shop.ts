@@ -8,6 +8,7 @@ import path from 'path';
 import sendMail from '../utils/sendMail';
 import cloudinary from 'cloudinary';
 import { sendToken } from '../utils/jwtToken';
+import { redis } from '../utils/redis';
 
 // create shop
 interface IRegistrationBody {
@@ -172,6 +173,21 @@ export const loginShop = catchAsyncError(
         return next(new ErrorHandler('Invalid credentials', 400));
       }
       sendToken(seller, 200, res);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+export const logoutShop = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.cookie('seller_token', '', { maxAge: 1 });
+      const shopId = req.user?._id || '';
+      redis.del(shopId);
+      res
+        .status(200)
+        .json({ success: true, message: 'Logged out successfully' });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }

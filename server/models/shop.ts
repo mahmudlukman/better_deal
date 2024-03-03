@@ -72,7 +72,7 @@ const ShopSchema: Schema<IShop> = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: 'Seller',
+      default: 'seller',
     },
     avatar: {
       public_id: {
