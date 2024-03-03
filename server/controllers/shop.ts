@@ -7,6 +7,7 @@ import ejs from 'ejs';
 import path from 'path';
 import sendMail from '../utils/sendMail';
 import cloudinary from 'cloudinary';
+import { sendToken } from '../utils/jwtToken';
 
 // create shop
 interface IRegistrationBody {
@@ -140,6 +141,37 @@ export const activateShop = catchAsyncError(
         zipCode,
       });
       res.status(201).json({ success: true });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// Login shop
+interface ILoginRequest {
+  email: string;
+  password: string;
+}
+
+export const loginShop = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, password } = req.body as ILoginRequest;
+
+      if (!email || !password) {
+        return next(new ErrorHandler('Please enter email and password', 400));
+      }
+      const seller = await ShopModel.findOne({ email }).select('+password');
+
+      if (!seller) {
+        return next(new ErrorHandler('Invalid credentials', 400));
+      }
+
+      const isPasswordMatch = await seller.comparePassword(password);
+      if (!isPasswordMatch) {
+        return next(new ErrorHandler('Invalid credentials', 400));
+      }
+      sendToken(seller, 200, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }

@@ -2,6 +2,7 @@ require('dotenv').config();
 import { Response } from 'express';
 import { redis } from './redis';
 import { IUser } from '../models/user';
+import { IShop } from '../models/shop';
 
 interface ITokenOptions {
   expires: Date;
@@ -36,7 +37,11 @@ export const refreshTokenOptions: ITokenOptions = {
   sameSite: 'lax',
 };
 
-export const sendToken = (user: IUser, statusCode: number, res: Response) => {
+export const sendToken = (
+  user: IUser | IShop,
+  statusCode: number,
+  res: Response
+) => {
   const accessToken = user.SignAccessToken();
   const refreshToken = user.SignRefreshToken();
 

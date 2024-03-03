@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document } from 'mongoose';
+require('dotenv').config();
+import mongoose, { Document, Model, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -17,25 +18,39 @@ export interface IShop extends Document {
   zipCode: number;
   withdrawMethod?: object;
   availableBalance: number;
-  transactions: {
-    amount: number;
-    status: string;
-    createdAt: Date;
-    updatedAt?: Date;
-  }[];
-  resetPasswordToken?: string;
-  resetPasswordTime?: Date;
+  transactions: ITransactions[];
+  comparePassword: (password: string) => Promise<boolean>;
+  SignAccessToken: () => string;
+  SignRefreshToken: () => string;
 }
+
+interface ITransactions {
+  _id: any;
+  amount: number;
+  status: string;
+}
+
+const TransactionsSchema: Schema<ITransactions> = new mongoose.Schema(
+  {
+    amount: {
+      type: Number,
+    },
+    status: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
 const ShopSchema: Schema<IShop> = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please enter your shop name!'],
+      required: [true, 'Please enter your name!'],
     },
     email: {
       type: String,
-      required: [true, 'Please enter your shop email address'],
+      required: [true, 'Please enter your email!'],
       unique: true,
     },
     password: {
@@ -80,27 +95,7 @@ const ShopSchema: Schema<IShop> = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    transactions: [
-      {
-        amount: {
-          type: Number,
-          required: true,
-        },
-        status: {
-          type: String,
-          default: 'Processing',
-        },
-        createdAt: {
-          type: Date,
-          default: Date.now(),
-        },
-        updatedAt: {
-          type: Date,
-        },
-      },
-    ],
-    resetPasswordToken: String,
-    resetPasswordTime: Date,
+    transactions: [TransactionsSchema],
   },
   { timestamps: true }
 );
@@ -135,6 +130,6 @@ ShopSchema.methods.comparePassword = async function (
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-const ShopModel = mongoose.model<IShop>('Shop', ShopSchema);
+const ShopModel: Model<IShop> = mongoose.model('Shop', ShopSchema);
 
 export default ShopModel;
