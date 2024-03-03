@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { catchAsyncError } from '../middleware/catchAsyncErrors';
 import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
-import ShopModel from '../models/shop';
+import ShopModel, { IShop } from '../models/shop';
 import ErrorHandler from '../utils/ErrorHandler';
 import ejs from 'ejs';
 import path from 'path';
@@ -13,7 +13,7 @@ interface IRegistrationBody {
   name: string;
   email: string;
   password: string;
-  avatar?: string;
+  avatar: object;
   address: string;
   phoneNumber: string;
   zipCode?: string;
@@ -33,13 +33,17 @@ export const createShop = catchAsyncError(
 
       const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
         folder: 'avatars',
+        width: 150,
       });
 
       const seller: IRegistrationBody = {
         name,
         email,
         password,
-        avatar,
+        avatar: {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        },
         address,
         phoneNumber,
         zipCode,
@@ -96,3 +100,48 @@ export const createActivationToken = (seller: any): IActivationToken => {
   );
   return { token, activationCode };
 };
+
+// activate shop
+interface IActivationRequest {
+  activation_token: string;
+  activation_code: string;
+}
+
+// activate user
+export const activateShop = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { activation_token, activation_code } =
+        req.body as IActivationRequest;
+
+      const newSeller: { seller: IShop; activationCode: string } = jwt.verify(
+        activation_token,
+        process.env.ACTIVATION_SECRET as string
+      ) as { seller: IShop; activationCode: string };
+
+      if (newSeller.activationCode !== activation_code) {
+        return next(new ErrorHandler('Invalid activation code', 400));
+      }
+      const { name, email, password, avatar, address, phoneNumber, zipCode } =
+        newSeller.seller;
+
+      const isShopExist = await ShopModel.findOne({ email });
+
+      if (isShopExist) {
+        return next(new ErrorHandler('Email already exist', 400));
+      }
+      const seller = await ShopModel.create({
+        name,
+        email,
+        password,
+        avatar,
+        address,
+        phoneNumber,
+        zipCode,
+      });
+      res.status(201).json({ success: true });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
