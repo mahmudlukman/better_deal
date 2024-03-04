@@ -6,6 +6,7 @@ import {
   getSeller,
   loginShop,
   logoutShop,
+  updateShopAvatar,
   updateShopInfo,
   updateShopPassword,
 } from '../controllers/shop';
@@ -34,6 +35,12 @@ shopRouter.put(
   '/update-shop-password',
   isAuthenticated,
   updateShopPassword
+);
+
+shopRouter.put(
+  '/update-shop-avatar',
+  isAuthenticated,
+  updateShopAvatar
 );
 
 export default shopRouter;

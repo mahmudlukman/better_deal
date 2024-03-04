@@ -367,5 +367,55 @@ export const updateShopPassword = catchAsyncError(
   }
 );
 
+// update user profile picture
+interface IUpdateShopAvatar {
+  avatar: string;
+}
+
+export const updateShopAvatar = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { avatar } = req.body as IUpdateShopAvatar;
+
+      const userId = req.user?._id;
+
+      const shop = await ShopModel.findById(userId);
+
+      if (avatar && shop) {
+        // if user have one avatar then call this if
+        if (shop?.avatar?.public_id) {
+          // first delete the old image
+          await cloudinary.v2.uploader.destroy(shop?.avatar?.public_id);
+
+          const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: 'avatars',
+            width: 150,
+          });
+          shop.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        } else {
+          const myCloud = await cloudinary.v2.uploader.upload(avatar, {
+            folder: 'avatars',
+            width: 150,
+          });
+          shop.avatar = {
+            public_id: myCloud.public_id,
+            url: myCloud.secure_url,
+          };
+        }
+      }
+
+      await shop?.save();
+
+      await redis.set(userId, JSON.stringify(shop));
+
+      res.status(200).json({ success: true, shop });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
 
 
