@@ -248,3 +248,6 @@ export const updateAccessToken = catchAsyncError(
     }
   }
 );
+
+// get shop info
+

@@ -45,11 +45,11 @@ export const isAuthenticated = catchAsyncError(
 //       if (!seller_token) {
 //         return next(new ErrorHandler('Please login to continue', 401));
 //       }
-  
-//       const decoded = jwt.verify(seller_token, process.env.JWT_SECRET_KEY);
-  
+
+//       const decoded = jwt.verify(seller_token, process.env.ACCESS_TOKEN);
+
 //       req.seller = await Shop.findById(decoded.id);
-  
+
 //       next();
 //     }
 //   );
@@ -69,3 +69,4 @@ export const authorizeRoles = (...roles: string[]) => {
     next();
   };
 };
+

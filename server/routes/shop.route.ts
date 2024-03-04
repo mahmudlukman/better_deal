@@ -9,6 +9,6 @@ shopRouter.post('/create-shop', createShop);
 shopRouter.post('/activate-shop', activateShop);
 shopRouter.post('/login-shop', loginShop);
 shopRouter.get('/logout-shop', isAuthenticated, authorizeRoles('seller'), logoutShop);
-shopRouter.get('/refresh-shop', isAuthenticated, authorizeRoles('seller'), updateAccessToken);
+shopRouter.get('/refresh-shop', authorizeRoles('seller'), updateAccessToken);
 
 export default shopRouter;

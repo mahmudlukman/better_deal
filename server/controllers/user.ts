@@ -26,23 +26,32 @@ interface IRegistrationBody {
   name: string;
   email: string;
   password: string;
-  avatar?: string;
+  avatar?: object;
 }
 
 export const registerUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password, avatar } = req.body;
 
       const isEmailExist = await UserModel.findOne({ email });
       if (isEmailExist) {
         return next(new ErrorHandler('Email already exist', 400));
       }
 
+      const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+        folder: 'avatars',
+        width: 150,
+      });
+
       const user: IRegistrationBody = {
         name,
         email,
         password,
+        avatar: {
+          public_id: myCloud.public_id,
+          url: myCloud.secure_url,
+        },
       };
       const activationToken = createActivationToken(user);
 
@@ -118,7 +127,7 @@ export const activateUser = catchAsyncError(
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler('Invalid activation code', 400));
       }
-      const { name, email, password } = newUser.user;
+      const { name, email, password, avatar } = newUser.user;
 
       const existUser = await UserModel.findOne({ email });
 
@@ -129,6 +138,7 @@ export const activateUser = catchAsyncError(
         name,
         email,
         password,
+        avatar,
       });
       res.status(201).json({ success: true });
     } catch (error: any) {
