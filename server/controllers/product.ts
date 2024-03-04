@@ -92,3 +92,15 @@ export const deleteProductInShop = catchAsyncError(
     }
   }
 );
+
+// get all products
+export const getAllProducts = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const products = await ProductModel.find().sort({ createdAt: -1 });
+      res.status(201).json({ success: true, products });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
