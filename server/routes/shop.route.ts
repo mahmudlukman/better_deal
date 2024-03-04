@@ -3,6 +3,7 @@ import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 import {
   activateShop,
   createShop,
+  deleteShop,
   getAllShops,
   getSeller,
   loginShop,
@@ -49,6 +50,13 @@ shopRouter.get(
   isAuthenticated,
   authorizeRoles('admin'),
   getAllShops
+);
+
+shopRouter.delete(
+  '/delete-shop/:id',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  deleteShop
 );
 
 export default shopRouter;

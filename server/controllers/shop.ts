@@ -436,3 +436,25 @@ export const getAllShops = catchAsyncError(
     }
   }
 );
+
+//delete user ---only for admin
+
+export const deleteShop = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const shop = await ShopModel.findById(id);
+      if (!shop) {
+        return next(new ErrorHandler('Shop not found', 404));
+      }
+      await shop.deleteOne({ id });
+      await redis.del(id);
+      res.status(200).json({
+        success: true,
+        message: 'Shop deleted successfully',
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
