@@ -9,6 +9,7 @@ import sendMail from '../utils/sendMail';
 import cloudinary from 'cloudinary';
 import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwtToken';
 import { redis } from '../utils/redis';
+import UserModel from '../models/user';
 
 // create shop
 interface IRegistrationBody {
@@ -249,5 +250,56 @@ export const updateAccessToken = catchAsyncError(
   }
 );
 
+// get seller info
+export const getSeller = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+      
+      // Fetch user information
+      const user = await ShopModel.findById(userId);
+      
+      // If the user is not found or if it's not a shop, throw an error
+      if (!user || user.role !== 'seller') {
+        return next(
+          new ErrorHandler('Seller information not found', 400)
+        );
+      }
+      
+      // Fetch shop information based on the user ID
+      const shop = await ShopModel.findById(userId);
+      
+      // If shop information is not found, throw an error
+      if (!shop) {
+        return next(
+          new ErrorHandler('Shop information not found', 400)
+        );
+      }
+
+      // Return the shop information
+      res.status(200).json({
+        success: true,
+        shop,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+
 // get shop info
+export const getShopInfo = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const shop = await ShopModel.findById(req.params._id);
+      // Return the shop information
+      res.status(200).json({
+        success: true,
+        shop,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  })
+
+
 
