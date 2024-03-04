@@ -24,7 +24,7 @@ export interface IShop extends Document {
   SignRefreshToken: () => string;
 }
 
-interface ITransactions {
+interface ITransactions extends Document {
   _id: any;
   amount: number;
   status: string;
