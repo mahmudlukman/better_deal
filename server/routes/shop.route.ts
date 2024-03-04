@@ -7,6 +7,7 @@ import {
   loginShop,
   logoutShop,
   updateShopInfo,
+  updateShopPassword,
 } from '../controllers/shop';
 import { updateAccessToken } from '../controllers/user';
 
@@ -21,13 +22,18 @@ shopRouter.get(
   authorizeRoles('seller'),
   logoutShop
 );
-shopRouter.get('/refresh-shop', authorizeRoles('seller'), updateAccessToken);
+shopRouter.get('/refresh-shop', updateAccessToken);
 shopRouter.get('/my-shop', isAuthenticated, getSeller);
 shopRouter.put(
-  '/update-shop-info/',
+  '/update-shop-info',
   // updateAccessToken,
   isAuthenticated,
   updateShopInfo
+);
+shopRouter.put(
+  '/update-shop-password',
+  isAuthenticated,
+  updateShopPassword
 );
 
 export default shopRouter;

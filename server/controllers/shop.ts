@@ -327,5 +327,45 @@ export const updateShopInfo = catchAsyncError(
   }
 );
 
+// update user password
+interface IUpdatePassword {
+  oldPassword: string;
+  newPassword: string;
+}
+
+export const updateShopPassword = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { oldPassword, newPassword } = req.body as IUpdatePassword;
+
+      if (!oldPassword || !newPassword) {
+        return next(new ErrorHandler('Please enter old and new password', 400));
+      }
+
+      const shop = await ShopModel.findById(req.user?._id).select('+password');
+
+      if (shop?.password === undefined) {
+        return next(new ErrorHandler('Invalid shop', 400));
+      }
+
+      const isPasswordMatch = await shop?.comparePassword(oldPassword);
+
+      if (!isPasswordMatch) {
+        return next(new ErrorHandler('Invalid old password', 400));
+      }
+
+      shop.password = newPassword;
+
+      await shop.save();
+
+      await redis.set(req.user?._id, JSON.stringify(shop));
+
+      res.status(201).json({ success: true, message: "Password Updated Successfully" });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
 
 
