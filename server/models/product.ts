@@ -21,11 +21,12 @@ export interface IProduct extends Document {
   createdAt: Date;
 }
 
-interface IReview extends Document {
+export interface IReview extends Document {
   user: IUser;
   rating: number;
   comment: string;
   productId: string;
+  orderId: string;
 }
 
 const ReviewSchema: Schema<IReview> = new mongoose.Schema(
