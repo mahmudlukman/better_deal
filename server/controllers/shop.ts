@@ -286,20 +286,46 @@ export const getSeller = catchAsyncError(
     }
   })
 
-// get shop info
-export const getShopInfo = catchAsyncError(
+  // update user info
+interface IUpdateUserInfo {
+  name?: string;
+  phoneNumber?: number;
+  address: string;
+  zipCode: number;
+}
+
+// Update Shop info
+export const updateShopInfo = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const shop = await ShopModel.findById(req.params._id);
-      // Return the shop information
-      res.status(200).json({
-        success: true,
-        shop,
-      });
+      const { name, phoneNumber, address, zipCode } = req.body as IUpdateUserInfo;
+      const userId = req.user?._id;
+      const shop = await ShopModel.findById(userId);
+
+      if (name && shop) {
+        shop.name = name;
+      }
+
+      if (phoneNumber && shop) {
+        shop.phoneNumber = phoneNumber;
+      }
+      if (address && shop) {
+        shop.address = address;
+      }
+      if (zipCode && shop) {
+        shop.zipCode = zipCode;
+      }
+
+      await shop?.save();
+
+      await redis.set(userId, JSON.stringify(shop));
+
+      res.status(201).json({ success: true, shop });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
-  })
+  }
+);
 
 
 
