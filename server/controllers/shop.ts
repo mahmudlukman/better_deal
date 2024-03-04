@@ -247,7 +247,7 @@ export const updateAccessToken = catchAsyncError(
       await redis.set(user._id, JSON.stringify(user), 'EX', 604800); // 7 days
 
       res.status(200).json({ status: 'success', accessToken });
-      // next();
+      next();
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -438,7 +438,6 @@ export const getAllShops = catchAsyncError(
 );
 
 //delete user ---only for admin
-
 export const deleteShop = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -452,6 +451,50 @@ export const deleteShop = catchAsyncError(
       res.status(200).json({
         success: true,
         message: 'Shop deleted successfully',
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+//update seller withdraw methods --- sellers
+export const updateWithdrawMethod = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const { withdrawMethod } = req.body;
+      const shop = await ShopModel.findByIdAndUpdate(id, { withdrawMethod });
+
+      res.status(200).json({
+        success: true,
+        shop,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// delete seller withdraw methods --- only seller
+export const deleteWithdrawMethod = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+
+      const shop = await ShopModel.findById(userId);
+
+      if (!shop) {
+        return next(new ErrorHandler('Shop not found with this id', 400));
+      }
+
+      shop.withdrawMethod = null;
+
+      await shop.save();
+
+      res.status(200).json({
+        success: true,
+        shop,
       });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

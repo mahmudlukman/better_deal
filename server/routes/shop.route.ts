@@ -4,6 +4,7 @@ import {
   activateShop,
   createShop,
   deleteShop,
+  deleteWithdrawMethod,
   getAllShops,
   getSeller,
   loginShop,
@@ -11,6 +12,7 @@ import {
   updateShopAvatar,
   updateShopInfo,
   updateShopPassword,
+  updateWithdrawMethod,
 } from '../controllers/shop';
 import { updateAccessToken } from '../controllers/user';
 
@@ -57,6 +59,22 @@ shopRouter.delete(
   isAuthenticated,
   authorizeRoles('admin'),
   deleteShop
+);
+
+shopRouter.put(
+  '/update-payment-methods',
+  updateAccessToken,
+  isAuthenticated,
+  authorizeRoles('seller'),
+  updateWithdrawMethod
+);
+
+shopRouter.delete(
+  '/delete-withdraw-method/:id',
+  updateAccessToken,
+  isAuthenticated,
+  authorizeRoles('seller'),
+  deleteWithdrawMethod
 );
 
 export default shopRouter;

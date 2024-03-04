@@ -16,7 +16,7 @@ export interface IShop extends Document {
     url: string;
   };
   zipCode: number;
-  withdrawMethod?: object;
+  withdrawMethod?: object | null;
   availableBalance: number;
   transactions: ITransactions[];
   comparePassword: (password: string) => Promise<boolean>;
