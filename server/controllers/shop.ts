@@ -7,7 +7,11 @@ import ejs from 'ejs';
 import path from 'path';
 import sendMail from '../utils/sendMail';
 import cloudinary from 'cloudinary';
-import { accessTokenOptions, refreshTokenOptions, sendToken } from '../utils/jwtToken';
+import {
+  accessTokenOptions,
+  refreshTokenOptions,
+  sendToken,
+} from '../utils/jwtToken';
 import { redis } from '../utils/redis';
 import UserModel from '../models/user';
 
@@ -255,25 +259,21 @@ export const getSeller = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-      
+
       // Fetch user information
       const user = await ShopModel.findById(userId);
-      
+
       // If the user is not found or if it's not a shop, throw an error
       if (!user || user.role !== 'seller') {
-        return next(
-          new ErrorHandler('Seller information not found', 400)
-        );
+        return next(new ErrorHandler('Seller information not found', 400));
       }
-      
+
       // Fetch shop information based on the user ID
       const shop = await ShopModel.findById(userId);
-      
+
       // If shop information is not found, throw an error
       if (!shop) {
-        return next(
-          new ErrorHandler('Shop information not found', 400)
-        );
+        return next(new ErrorHandler('Shop information not found', 400));
       }
 
       // Return the shop information
@@ -284,9 +284,10 @@ export const getSeller = catchAsyncError(
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
-  })
+  }
+);
 
-  // update user info
+// update user info
 interface IUpdateUserInfo {
   name?: string;
   phoneNumber?: number;
@@ -298,7 +299,8 @@ interface IUpdateUserInfo {
 export const updateShopInfo = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, phoneNumber, address, zipCode } = req.body as IUpdateUserInfo;
+      const { name, phoneNumber, address, zipCode } =
+        req.body as IUpdateUserInfo;
       const userId = req.user?._id;
       const shop = await ShopModel.findById(userId);
 
@@ -360,7 +362,9 @@ export const updateShopPassword = catchAsyncError(
 
       await redis.set(req.user?._id, JSON.stringify(shop));
 
-      res.status(201).json({ success: true, message: "Password Updated Successfully" });
+      res
+        .status(201)
+        .json({ success: true, message: 'Password Updated Successfully' });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -418,4 +422,17 @@ export const updateShopAvatar = catchAsyncError(
   }
 );
 
-
+// get all users --- only for admin
+export const getAllShops = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const shops = await ShopModel.find().sort({ created: -1 });
+      res.status(201).json({
+        success: true,
+        shops,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);

@@ -3,6 +3,7 @@ import { authorizeRoles, isAuthenticated } from '../middleware/auth';
 import {
   activateShop,
   createShop,
+  getAllShops,
   getSeller,
   loginShop,
   logoutShop,
@@ -41,6 +42,13 @@ shopRouter.put(
   '/update-shop-avatar',
   isAuthenticated,
   updateShopAvatar
+);
+
+shopRouter.get(
+  '/get-shops',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  getAllShops
 );
 
 export default shopRouter;
