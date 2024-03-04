@@ -5,6 +5,7 @@ import ShopModel from '../models/shop';
 import cloudinary from 'cloudinary';
 import ProductModel from '../models/product';
 
+// create product
 export const createProduct = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -46,6 +47,18 @@ export const createProduct = catchAsyncError(
           product,
         });
       }
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// get all products of a shop
+export const getAllProductsInShop = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const products = await ProductModel.find({ shopId: req.params.id });
+      res.status(201).json({ success: true, products });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
