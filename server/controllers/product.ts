@@ -93,7 +93,7 @@ export const deleteProductInShop = catchAsyncError(
   }
 );
 
-// get all products
+// get all products -- seller
 export const getAllProducts = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -109,7 +109,7 @@ export const getAllProducts = catchAsyncError(
 export const reviewProduct = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { user, rating, comment, productId, orderId } = req.body as IReview;
+      const { user, rating, comment, productId } = req.body as IReview;
 
       const product = await ProductModel.findById(productId);
 
@@ -118,15 +118,21 @@ export const reviewProduct = catchAsyncError(
       }
 
       const review: any = {
-        user,
+        user: req.user,
         rating,
         comment,
         productId,
       };
 
-      const isReviewed = product.reviews.find(
-        (rev) => rev.user._id === req.user?._id
-      );
+      // const isReviewed = product.reviews.find(
+      //   (rev) => rev.user._id === req.user?._id
+      // );
+      const isReviewed = product.reviews.find((rev) => {
+        if (!rev.user) {
+          return next(new ErrorHandler('User not found', 404));
+        }
+        return rev.user._id === req.user?._id;
+      });
 
       if (isReviewed) {
         product?.reviews.forEach((rev) => {
@@ -168,3 +174,4 @@ export const reviewProduct = catchAsyncError(
     }
   }
 );
+
