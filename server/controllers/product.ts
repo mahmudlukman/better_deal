@@ -118,7 +118,7 @@ export const reviewProduct = catchAsyncError(
       }
 
       const review: any = {
-        user: req.user,
+        user,
         rating,
         comment,
         productId,
