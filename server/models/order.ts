@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 import { IUser } from './user';
 
 interface IOrderItem {
+  shopId: any;
   _id: string;
   quantity: number;
 }
@@ -19,7 +20,7 @@ interface IPaymentInfo {
   type: string;
 }
 
-interface IOrder extends Document {
+export interface IOrder extends Document {
   cart: IOrderItem[];
   shippingAddress: IShippingAddress;
   user: IUser;

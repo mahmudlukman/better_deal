@@ -4,6 +4,7 @@ import ErrorHandler from '../utils/ErrorHandler';
 import ShopModel from '../models/shop';
 import cloudinary from 'cloudinary';
 import ProductModel, { IReview } from '../models/product';
+import OrderModel from '../models/order';
 
 // create product
 export const createProduct = catchAsyncError(
@@ -159,7 +160,7 @@ export const reviewProduct = catchAsyncError(
 
       await product.save();
 
-      // await Order.findByIdAndUpdate(
+      // await OrderModel.findByIdAndUpdate(
       //   orderId,
       //   { $set: { 'cart.$[elem].isReviewed': true } },
       //   { arrayFilters: [{ 'elem._id': productId }], new: true }
