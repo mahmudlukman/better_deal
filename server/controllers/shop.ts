@@ -462,9 +462,16 @@ export const deleteShop = catchAsyncError(
 export const updateWithdrawMethod = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id } = req.params;
+      // const { id } = req.params;
+      const userId = req.user?._id;
       const { withdrawMethod } = req.body;
-      const shop = await ShopModel.findByIdAndUpdate(id, { withdrawMethod });
+      const shop = await ShopModel.findByIdAndUpdate(
+        userId,
+        { withdrawMethod },
+        {
+          new: true,
+        }
+      );
 
       res.status(200).json({
         success: true,

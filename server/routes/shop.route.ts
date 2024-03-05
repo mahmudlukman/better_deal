@@ -63,17 +63,17 @@ shopRouter.delete(
 
 shopRouter.put(
   '/update-payment-methods',
-  updateAccessToken,
+  // updateAccessToken,
   isAuthenticated,
-  authorizeRoles('seller'),
+  // authorizeRoles('seller'),
   updateWithdrawMethod
 );
 
 shopRouter.delete(
   '/delete-withdraw-method/:id',
-  updateAccessToken,
+  // updateAccessToken,
   isAuthenticated,
-  authorizeRoles('seller'),
+  // authorizeRoles('seller'),
   deleteWithdrawMethod
 );
 
