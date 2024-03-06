@@ -1,7 +1,6 @@
 import { apiSlice } from '../api/apiSlice';
 import { userLoggedOut, userLoggedIn, userRegistration } from './authSlice';
 
-
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
