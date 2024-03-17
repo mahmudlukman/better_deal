@@ -1,16 +1,20 @@
-"use client"
-import { React, useState } from "react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import styles from "../../styles/styles";
-import { RxAvatar } from "react-icons/rx";
-import Link from "next/link";
+'use client';
+import { React, useState, useEffect } from 'react';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import styles from '../../styles/styles';
+import { RxAvatar } from 'react-icons/rx';
+import { useRegisterMutation } from '../../../redux/features/auth/authApi';
+import Link from 'next/link';
+import toast from 'react-hot-toast';
+import { redirect } from 'next/navigation';
 
 const Singup = () => {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  const [register, { isError, data, isSuccess, error }] = useRegisterMutation();
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
@@ -26,7 +30,28 @@ const Singup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = {
+      name,
+      email,
+      password,
+      avatar,
+    };
+    await register(data);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      const message = data?.message || 'Registration successful';
+      toast.success(message);
+      redirect('/verification');
+    }
+    if (error) {
+      if ('data' in error) {
+        const errorData = error;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccess, error]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -87,7 +112,7 @@ const Singup = () => {
               </label>
               <div className="mt-1 relative">
                 <input
-                  type={visible ? "text" : "password"}
+                  type={visible ? 'text' : 'password'}
                   name="password"
                   autoComplete="current-password"
                   required
