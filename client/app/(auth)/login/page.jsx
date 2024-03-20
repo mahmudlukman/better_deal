@@ -1,18 +1,41 @@
-"use client"
-import { React, useState } from 'react';
+'use client';
+import { React, useState, useEffect } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import styles from '../../styles/styles';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
+import { useLoginMutation } from '../../../redux/features/auth/authApi';
+import { BeatLoader } from 'react-spinners';
+import { redirect } from 'next/navigation';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
+  const [login, { isSuccess, data, isLoading, error }] = useLoginMutation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const data = {
+      email,
+      password,
+    };
+    await login(data);
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      const message = data?.message || 'Welcome';
+      toast.success(message);
+      redirect('/Home');
+    }
+    if (error) {
+      if ('data' in error) {
+        const errorData = error;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccess, error]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -104,7 +127,8 @@ const Login = () => {
                 type="submit"
                 className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Submit
+                {isLoading ? <BeatLoader color="white" /> : 'Submit'}
+                {/* Submit */}
               </button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
