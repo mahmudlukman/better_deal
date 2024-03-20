@@ -16,11 +16,11 @@ import {
   updateUserRole,
 } from '../controllers/user';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
-import { validateUser } from '../middleware/validator';
+import { validate, validateUser } from '../middleware/validator';
 
 const userRouter = express.Router();
 
-userRouter.post('/register', validateUser, registerUser);
+userRouter.post('/register', validateUser, validate, registerUser);
 userRouter.post('/activate-user', activateUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/logout', isAuthenticated, logoutUser);

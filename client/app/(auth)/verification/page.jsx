@@ -8,10 +8,11 @@ import { useSelector } from 'react-redux';
 import { useActivationMutation } from '../../../redux/features/auth/authApi';
 import { useEffect } from 'react';
 import { redirect } from 'next/navigation';
+import { BeatLoader } from 'react-spinners';
 
 const Verification = () => {
   const { token } = useSelector((state) => state.auth);
-  const [activation, { isSuccess, error }] = useActivationMutation();
+  const [activation, { isSuccess, isLoading, error }] = useActivationMutation();
   const [invalidError, setInvalidError] = useState(false);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const Verification = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <div className="w-full flex items-center justify-center mt-2">
-            <div className="w-[80px] h-[80px] rounded-full bg-black text-white flex items-center justify-center">
+            <div className="w-[80px] h-[80px] rounded-full bg-blue-600 text-white flex items-center justify-center">
               <VscWorkspaceTrusted size={40} />
             </div>
           </div>
@@ -97,12 +98,12 @@ const Verification = () => {
           </div>
           <br />
           <br />
-          <div className='flex justify-center'>
+          <div className="flex justify-center">
             <div
-              className={`${styles.button} text-white`}
+              className={`${styles.button} text-white bg-blue-600`}
               onClick={verificationHandler}
             >
-              Verify OTP
+              {isLoading ? <BeatLoader color="white" /> : 'Verify OTP'}
             </div>
           </div>
           <br />
