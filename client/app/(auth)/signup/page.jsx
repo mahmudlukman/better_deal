@@ -7,6 +7,7 @@ import { useRegisterMutation } from '../../../redux/features/auth/authApi';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { redirect } from 'next/navigation';
+import { BeatLoader } from 'react-spinners';
 
 const Singup = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +15,8 @@ const Singup = () => {
   const [password, setPassword] = useState('');
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
-  const [register, { isError, data, isSuccess, error }] = useRegisterMutation();
+  const [register, { isError, data, isLoading, isSuccess, error }] =
+    useRegisterMutation();
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
@@ -77,6 +79,7 @@ const Singup = () => {
                   autoComplete="name"
                   required
                   value={name}
+                  disabled={isLoading}
                   onChange={(e) => setName(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -97,6 +100,7 @@ const Singup = () => {
                   autoComplete="email"
                   required
                   value={email}
+                  disabled={isLoading}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -117,6 +121,7 @@ const Singup = () => {
                   autoComplete="current-password"
                   required
                   value={password}
+                  disabled={isLoading}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
@@ -164,6 +169,7 @@ const Singup = () => {
                     id="file-input"
                     accept=".jpg,.jpeg,.png"
                     onChange={handleFileInputChange}
+                    disabled={isLoading}
                     className="sr-only"
                   />
                 </label>
@@ -173,9 +179,10 @@ const Singup = () => {
             <div>
               <button
                 type="submit"
+                disabled={isLoading}
                 className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
-                Submit
+                {isLoading ? <BeatLoader /> : 'Submit'}
               </button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
