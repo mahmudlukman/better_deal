@@ -10,9 +10,10 @@ import {
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { BiMenuAltLeft } from 'react-icons/bi';
 import { CgProfile } from 'react-icons/cg';
-import DropDown from '../Layout/DropDown'
+import DropDown from './DropDown'
+import Navbar from './Navbar'
 
-const Header = () => {
+const Header = ({activeHeading}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
@@ -133,7 +134,7 @@ const Header = () => {
           </div>
           {/* navitems */}
           <div className={`${styles.noramlFlex}`}>
-            {/* <Navbar active={activeHeading} /> */}
+            <Navbar active={activeHeading} />
           </div>
 
           <div className="flex">

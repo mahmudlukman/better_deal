@@ -10,7 +10,7 @@ export default function Home() {
         description="Multi-vendor E-commerce Platform"
         keywords="shop, buy, sell, online shopping"
       />
-      <Header />
+      <Header activeHeading={1}/>
     </div>
   );
 }
