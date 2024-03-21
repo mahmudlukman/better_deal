@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../styles/styles';
-import { productData } from '../static/data';
+import styles from '../../styles/styles';
+import { productData, categoriesData } from '../../static/data';
 import Link from 'next/link';
 import {
   AiOutlineHeart,
@@ -10,11 +10,13 @@ import {
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { BiMenuAltLeft } from 'react-icons/bi';
 import { CgProfile } from 'react-icons/cg';
+import DropDown from '../Layout/DropDown'
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
+  const [dropDown, setDropDown] = useState(false);
 
   const handleSearchChange = (e) => {
     const term = e.target.value;
@@ -119,14 +121,14 @@ const Header = () => {
               <IoIosArrowDown
                 size={20}
                 className="absolute right-2 top-4 cursor-pointer"
-                // onClick={() => setDropDown(!dropDown)}
+                onClick={() => setDropDown(!dropDown)}
               />
-              {/* {dropDown ? (
+              {dropDown ? (
                 <DropDown
                   categoriesData={categoriesData}
                   setDropDown={setDropDown}
                 />
-              ) : null} */}
+              ) : null}
             </div>
           </div>
           {/* navitems */}

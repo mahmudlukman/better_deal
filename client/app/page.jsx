@@ -1,5 +1,5 @@
 'use client';
-import Header from './components/Header';
+import Header from './components/Layout/Header';
 import Heading from './utils/Heading';
 
 export default function Home() {
