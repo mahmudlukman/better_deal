@@ -27,7 +27,7 @@ const Login = () => {
     if (isSuccess) {
       const message = data?.message || 'Welcome';
       toast.success(message);
-      redirect('/Home');
+      redirect('/');
     }
     if (error) {
       if ('data' in error) {
@@ -133,7 +133,7 @@ const Login = () => {
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Not have any account?</h4>
-              <Link href="/sign-up" className="text-blue-600 pl-2">
+              <Link href="/signup" className="text-blue-600 pl-2">
                 Sign Up
               </Link>
             </div>
