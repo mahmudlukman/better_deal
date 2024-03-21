@@ -1,5 +1,6 @@
 'use client';
 import Header from './components/Layout/Header';
+import Hero from './components/Route/Hero/Hero'
 import Heading from './utils/Heading';
 
 export default function Home() {
@@ -10,7 +11,8 @@ export default function Home() {
         description="Multi-vendor E-commerce Platform"
         keywords="shop, buy, sell, online shopping"
       />
-      <Header activeHeading={1}/>
+      <Header activeHeading={1} />
+      <Hero />
     </div>
   );
 }
