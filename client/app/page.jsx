@@ -1,6 +1,7 @@
 'use client';
 import Header from './components/Layout/Header';
-import Hero from './components/Route/Hero/Hero'
+import Hero from './components/Route/Hero/Hero';
+import Categories from './components/Route/Categories/Categories';
 import Heading from './utils/Heading';
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       />
       <Header activeHeading={1} />
       <Hero />
+      <Categories />
     </div>
   );
 }
