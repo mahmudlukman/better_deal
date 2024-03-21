@@ -12,12 +12,14 @@ import { BiMenuAltLeft } from 'react-icons/bi';
 import { CgProfile } from 'react-icons/cg';
 import DropDown from './DropDown'
 import Navbar from './Navbar'
+import { useSelector } from 'react-redux';
 
 const Header = ({activeHeading}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchData, setSearchData] = useState(null);
   const [active, setActive] = useState(false);
   const [dropDown, setDropDown] = useState(false);
+  const { user } = useSelector((state) => state.auth);
 
   const handleSearchChange = (e) => {
     const term = e.target.value;
@@ -146,6 +148,7 @@ const Header = ({activeHeading}) => {
                 <AiOutlineHeart size={30} color="rgb(255 255 255 / 83%)" />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
                   {/* {wishlist && wishlist.length} */}
+                  0
                 </span>
               </div>
             </div>
@@ -161,14 +164,15 @@ const Header = ({activeHeading}) => {
                 />
                 <span className="absolute right-0 top-0 rounded-full bg-[#3bc177] w-4 h-4 top right p-0 m-0 text-white font-mono text-[12px] leading-tight text-center">
                   {/* {cart && cart.length} */}
+                  0
                 </span>
               </div>
             </div>
 
             <div className={`${styles.noramlFlex}`}>
               <div className="relative cursor-pointer mr-[15px]">
-                {/* {isAuthenticated ? (
-                  <Link to="/profile">
+                {user ? (
+                  <Link href="/profile">
                     <img
                       src={`${user?.avatar?.url}`}
                       className="w-[35px] h-[35px] rounded-full"
@@ -176,10 +180,10 @@ const Header = ({activeHeading}) => {
                     />
                   </Link>
                 ) : (
-                  <Link to="/login">
+                  <Link href="/login">
                     <CgProfile size={30} color="rgb(255 255 255 / 83%)" />
                   </Link>
-                )} */}
+                )}
               </div>
             </div>
 
