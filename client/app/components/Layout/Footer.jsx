@@ -75,7 +75,7 @@ const Footer = () => {
           ))}
         </ul>
 
-        {/* <ul className="text-center sm:text-start">
+        <ul className="text-center sm:text-start">
           <h1 className="mb-1 font-semibold">Shop</h1>
           {footercompanyLinks.map((link, index) => (
             <li key={index}>
@@ -88,9 +88,9 @@ const Footer = () => {
               </Link>
             </li>
           ))}
-        </ul> */}
+        </ul>
 
-        {/* <ul className="text-center sm:text-start">
+        <ul className="text-center sm:text-start">
           <h1 className="mb-1 font-semibold">Support</h1>
           {footerSupportLinks.map((link, index) => (
             <li key={index}>
@@ -103,7 +103,7 @@ const Footer = () => {
               </Link>
             </li>
           ))}
-        </ul> */}
+        </ul>
       </div>
 
       <div
