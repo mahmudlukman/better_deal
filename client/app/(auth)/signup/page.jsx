@@ -1,6 +1,6 @@
-"use client"
+'use client';
 import React, { useEffect } from 'react';
-import Signup from '../../components/pages/auth/Signup';
+import Signup from '../../components/Auth/Signup';
 import { redirect } from 'next/navigation';
 import { useSelector } from 'react-redux';
 

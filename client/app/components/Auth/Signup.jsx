@@ -1,9 +1,9 @@
 'use client';
 import { React, useState, useEffect } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import styles from '../../../styles/styles';
+import styles from '../../styles/styles';
 import { RxAvatar } from 'react-icons/rx';
-import { useRegisterMutation } from '../../../../redux/features/auth/authApi';
+import { useRegisterMutation } from '../../../redux/features/auth/authApi';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { redirect } from 'next/navigation';

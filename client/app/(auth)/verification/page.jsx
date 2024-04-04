@@ -1,11 +1,11 @@
-import React from 'react'
-import Verification from '../../components/pages/auth/Verification'
+import React from 'react';
+import Verification from '../../components/Auth/Verification';
 const VerificationPage = () => {
   return (
     <div>
-      <Verification/>
-      </div>
-  )
-}
+      <Verification />
+    </div>
+  );
+};
 
-export default VerificationPage
+export default VerificationPage;
