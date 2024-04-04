@@ -1,5 +1,5 @@
 import React from 'react'
-import Verification from '../../pages/auth/Verification'
+import Verification from '../../components/pages/auth/Verification'
 const VerificationPage = () => {
   return (
     <div>

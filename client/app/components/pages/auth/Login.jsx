@@ -1,10 +1,10 @@
 'use client';
 import { React, useState, useEffect } from 'react';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import styles from '../../styles/styles';
+import styles from '../../../styles/styles';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
-import { useLoginMutation } from '../../../redux/features/auth/authApi';
+import { useLoginMutation } from '../../../../redux/features/auth/authApi';
 import { BeatLoader } from 'react-spinners';
 import { redirect } from 'next/navigation';
 
