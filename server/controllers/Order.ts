@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { catchAsyncError } from '../middleware/catchAsyncErrors';
 import ErrorHandler from '../utils/ErrorHandler';
-import OrderModel, { IOrder } from '../models/order';
+import OrderModel, { IOrder } from '../models/Order';
 
 export const createOrder = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -69,7 +69,7 @@ export const getAllSellerOrders = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const orders = await OrderModel.find({
-        "cart.shopId": req.params.shopId,
+        'cart.shopId': req.params.shopId,
       }).sort({
         createdAt: -1,
       });
@@ -83,4 +83,3 @@ export const getAllSellerOrders = catchAsyncError(
     }
   }
 );
-

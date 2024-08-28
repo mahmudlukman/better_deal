@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { catchAsyncError } from '../middleware/catchAsyncErrors';
 import ErrorHandler from '../utils/ErrorHandler';
-import ShopModel from '../models/shop';
+import ShopModel from '../models/Shop';
 import cloudinary from 'cloudinary';
-import ProductModel, { IReview } from '../models/product';
-import OrderModel from '../models/order';
+import ProductModel, { IReview } from '../models/Product';
+import OrderModel from '../models/Order';
 
 // create product
 export const createProduct = catchAsyncError(
@@ -175,4 +175,3 @@ export const reviewProduct = catchAsyncError(
     }
   }
 );
-

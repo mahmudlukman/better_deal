@@ -1,41 +1,39 @@
-import { NextFunction, Request, Response } from 'express';
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import jwt, { JwtPayload, Secret } from 'jsonwebtoken';
-import ShopModel, { IShop } from '../models/Shop';
-import ErrorHandler from '../utils/ErrorHandler';
+import jwt from 'jsonwebtoken';
 import ejs from 'ejs';
 import path from 'path';
 import sendMail from '../utils/sendMail';
-import cloudinary from 'cloudinary';
 import {
   accessTokenOptions,
   refreshTokenOptions,
   sendToken,
 } from '../utils/jwtToken';
-import { redis } from '../utils/redis';
-import UserModel from '../models/User';
+import {
+  getAllUsersService,
+  getUserById,
+  updateUserRoleService,
+} from '../services/user.service';
+import cloudinary from 'cloudinary';
+import ErrorHandler from '../utils/ErrorHandler';
+import { catchAsyncError } from '../middleware/catchAsyncErrors';
+import UserModel, { IUser } from '../models/User';
+import user from '../models/User';
 
-// create shop
+// register user
 interface IRegistrationBody {
   name: string;
   email: string;
   password: string;
-  avatar: object;
-  address: string;
-  phoneNumber: string;
-  zipCode?: string;
+  avatar?: object;
 }
 
-// create shop
-export const createShop = catchAsyncError(
+export const registerUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password, avatar, address, phoneNumber, zipCode } =
-        req.body;
+      const { name, email, password, avatar } = req.body;
 
-      const isShopExist = await ShopModel.findOne({ email });
-      if (isShopExist) {
-        return next(new ErrorHandler('Shop already exist', 400));
+      const isEmailExist = await UserModel.findOne({ email });
+      if (isEmailExist) {
+        return next(new ErrorHandler('Email already exist', 400));
       }
 
       const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
@@ -43,7 +41,7 @@ export const createShop = catchAsyncError(
         width: 150,
       });
 
-      const seller: IRegistrationBody = {
+      const user: IRegistrationBody = {
         name,
         email,
         password,
@@ -51,30 +49,27 @@ export const createShop = catchAsyncError(
           public_id: myCloud.public_id,
           url: myCloud.secure_url,
         },
-        address,
-        phoneNumber,
-        zipCode,
       };
-      const activationToken = createActivationToken(seller);
+      const activationToken = createActivationToken(user);
 
       const activationCode = activationToken.activationCode;
 
-      const data = { seller: { name: seller.name }, activationCode };
+      const data = { user: { name: user.name }, activationCode };
       const html = await ejs.renderFile(
-        path.join(__dirname, '../mails/shop-activation-mail.ejs'),
+        path.join(__dirname, '../mails/activation-mail.ejs'),
         data
       );
 
       try {
         await sendMail({
-          email: seller.email,
-          subject: 'Activate your shop',
-          template: 'shop-activation-mail.ejs',
+          email: user.email,
+          subject: 'Activate your account',
+          template: 'activation-mail.ejs',
           data,
         });
         res.status(201).json({
           success: true,
-          message: `Please check your email: ${seller.email} to activate your shop!`,
+          message: `Please check your email: ${user.email} to activate your account!`,
           activationToken: activationToken.token,
         });
       } catch (error: any) {
@@ -92,12 +87,12 @@ interface IActivationToken {
 }
 
 // create activation token
-export const createActivationToken = (seller: any): IActivationToken => {
+export const createActivationToken = (user: any): IActivationToken => {
   const activationCode = Math.floor(1000 + Math.random() * 9000).toString();
 
   const token = jwt.sign(
     {
-      seller,
+      user,
       activationCode,
     },
     process.env.ACTIVATION_SECRET as Secret,
@@ -108,43 +103,39 @@ export const createActivationToken = (seller: any): IActivationToken => {
   return { token, activationCode };
 };
 
-// activate shop
+// activate user
 interface IActivationRequest {
   activation_token: string;
   activation_code: string;
 }
 
 // activate user
-export const activateShop = catchAsyncError(
+export const activateUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { activation_token, activation_code } =
         req.body as IActivationRequest;
 
-      const newSeller: { seller: IShop; activationCode: string } = jwt.verify(
+      const newUser: { user: IUser; activationCode: string } = jwt.verify(
         activation_token,
         process.env.ACTIVATION_SECRET as string
-      ) as { seller: IShop; activationCode: string };
+      ) as { user: IUser; activationCode: string };
 
-      if (newSeller.activationCode !== activation_code) {
+      if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler('Invalid activation code', 400));
       }
-      const { name, email, password, avatar, address, phoneNumber, zipCode } =
-        newSeller.seller;
+      const { name, email, password, avatar } = newUser.user;
 
-      const isShopExist = await ShopModel.findOne({ email });
+      const existUser = await UserModel.findOne({ email });
 
-      if (isShopExist) {
+      if (existUser) {
         return next(new ErrorHandler('Email already exist', 400));
       }
-      const seller = await ShopModel.create({
+      const user = await UserModel.create({
         name,
         email,
         password,
         avatar,
-        address,
-        phoneNumber,
-        zipCode,
       });
       res.status(201).json({ success: true });
     } catch (error: any) {
@@ -153,13 +144,13 @@ export const activateShop = catchAsyncError(
   }
 );
 
-// Login shop
+// Login user
 interface ILoginRequest {
   email: string;
   password: string;
 }
 
-export const loginShop = catchAsyncError(
+export const loginUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body as ILoginRequest;
@@ -167,29 +158,30 @@ export const loginShop = catchAsyncError(
       if (!email || !password) {
         return next(new ErrorHandler('Please enter email and password', 400));
       }
-      const seller = await ShopModel.findOne({ email }).select('+password');
+      const user = await UserModel.findOne({ email }).select('+password');
 
-      if (!seller) {
+      if (!user) {
         return next(new ErrorHandler('Invalid credentials', 400));
       }
 
-      const isPasswordMatch = await seller.comparePassword(password);
+      const isPasswordMatch = await user.comparePassword(password);
       if (!isPasswordMatch) {
         return next(new ErrorHandler('Invalid credentials', 400));
       }
-      sendToken(seller, 200, res);
+      sendToken(user, 200, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-export const logoutShop = catchAsyncError(
+export const logoutUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.cookie('seller_token', '', { maxAge: 1 });
-      const shopId = req.user?._id || '';
-      redis.del(shopId);
+      res.cookie('access_token', '', { maxAge: 1 });
+      res.cookie('refresh_token', '', { maxAge: 1 });
+      const userId = req.user?._id || '';
+      redis.del(userId);
       res
         .status(200)
         .json({ success: true, message: 'Logged out successfully' });
@@ -203,11 +195,6 @@ export const logoutShop = catchAsyncError(
 export const updateAccessToken = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Check if th user is a seller
-      if (req.user?.role !== 'seller') {
-        return next(new ErrorHandler('Unauthorized access', 403));
-      }
-
       const refresh_token = req.cookies.refresh_token as string;
       const decoded = jwt.verify(
         refresh_token,
@@ -247,40 +234,19 @@ export const updateAccessToken = catchAsyncError(
       await redis.set(user._id, JSON.stringify(user), 'EX', 604800); // 7 days
 
       res.status(200).json({ status: 'success', accessToken });
-      next();
+      // next();
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-// get seller info
-export const getSeller = catchAsyncError(
+// get user info
+export const getUserInfo = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?._id;
-
-      // Fetch user information
-      const user = await ShopModel.findById(userId);
-
-      // If the user is not found or if it's not a shop, throw an error
-      if (!user || user.role !== 'seller') {
-        return next(new ErrorHandler('Seller information not found', 400));
-      }
-
-      // Fetch shop information based on the user ID
-      const shop = await ShopModel.findById(userId);
-
-      // If shop information is not found, throw an error
-      if (!shop) {
-        return next(new ErrorHandler('Shop information not found', 400));
-      }
-
-      // Return the shop information
-      res.status(200).json({
-        success: true,
-        shop,
-      });
+      getUserById(userId, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -291,38 +257,36 @@ export const getSeller = catchAsyncError(
 interface IUpdateUserInfo {
   name?: string;
   phoneNumber?: number;
-  address: string;
-  zipCode: number;
 }
 
-// Update Shop info
-export const updateShopInfo = catchAsyncError(
+export const updateUserInfo = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, phoneNumber, address, zipCode } =
-        req.body as IUpdateUserInfo;
+      const { name, phoneNumber } = req.body as IUpdateUserInfo;
       const userId = req.user?._id;
-      const shop = await ShopModel.findById(userId);
+      const user = await UserModel.findById(userId);
 
-      if (name && shop) {
-        shop.name = name;
+      // if (email && user) {
+      //   const isEmailExist = await UserModel.findOne({ email });
+      //   if (isEmailExist) {
+      //     return next(new ErrorHandler('Email already exist', 400));
+      //   }
+      //   user.email = email;
+      // }
+
+      if (name && user) {
+        user.name = name;
       }
 
-      if (phoneNumber && shop) {
-        shop.phoneNumber = phoneNumber;
-      }
-      if (address && shop) {
-        shop.address = address;
-      }
-      if (zipCode && shop) {
-        shop.zipCode = zipCode;
+      if (phoneNumber && user) {
+        user.phoneNumber = phoneNumber;
       }
 
-      await shop?.save();
+      await user?.save();
 
-      await redis.set(userId, JSON.stringify(shop));
+      await redis.set(userId, JSON.stringify(user));
 
-      res.status(201).json({ success: true, shop });
+      res.status(201).json({ success: true, user });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -335,7 +299,7 @@ interface IUpdatePassword {
   newPassword: string;
 }
 
-export const updateShopPassword = catchAsyncError(
+export const updatePassword = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { oldPassword, newPassword } = req.body as IUpdatePassword;
@@ -344,27 +308,25 @@ export const updateShopPassword = catchAsyncError(
         return next(new ErrorHandler('Please enter old and new password', 400));
       }
 
-      const shop = await ShopModel.findById(req.user?._id).select('+password');
+      const user = await UserModel.findById(req.user?._id).select('+password');
 
-      if (shop?.password === undefined) {
-        return next(new ErrorHandler('Invalid shop', 400));
+      if (user?.password === undefined) {
+        return next(new ErrorHandler('Invalid user', 400));
       }
 
-      const isPasswordMatch = await shop?.comparePassword(oldPassword);
+      const isPasswordMatch = await user?.comparePassword(oldPassword);
 
       if (!isPasswordMatch) {
         return next(new ErrorHandler('Invalid old password', 400));
       }
 
-      shop.password = newPassword;
+      user.password = newPassword;
 
-      await shop.save();
+      await user.save();
 
-      await redis.set(req.user?._id, JSON.stringify(shop));
+      await redis.set(req.user?._id, JSON.stringify(user));
 
-      res
-        .status(201)
-        .json({ success: true, message: 'Password Updated Successfully' });
+      res.status(201).json({ success: true, user });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -372,30 +334,30 @@ export const updateShopPassword = catchAsyncError(
 );
 
 // update user profile picture
-interface IUpdateShopAvatar {
+interface IUpdateProfilePicture {
   avatar: string;
 }
 
-export const updateShopAvatar = catchAsyncError(
+export const updateProfilePicture = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { avatar } = req.body as IUpdateShopAvatar;
+      const { avatar } = req.body as IUpdateProfilePicture;
 
       const userId = req.user?._id;
 
-      const shop = await ShopModel.findById(userId);
+      const user = await UserModel.findById(userId);
 
-      if (avatar && shop) {
+      if (avatar && user) {
         // if user have one avatar then call this if
-        if (shop?.avatar?.public_id) {
+        if (user?.avatar?.public_id) {
           // first delete the old image
-          await cloudinary.v2.uploader.destroy(shop?.avatar?.public_id);
+          await cloudinary.v2.uploader.destroy(user?.avatar?.public_id);
 
           const myCloud = await cloudinary.v2.uploader.upload(avatar, {
             folder: 'avatars',
             width: 150,
           });
-          shop.avatar = {
+          user.avatar = {
             public_id: myCloud.public_id,
             url: myCloud.secure_url,
           };
@@ -404,18 +366,90 @@ export const updateShopAvatar = catchAsyncError(
             folder: 'avatars',
             width: 150,
           });
-          shop.avatar = {
+          user.avatar = {
             public_id: myCloud.public_id,
             url: myCloud.secure_url,
           };
         }
       }
 
-      await shop?.save();
+      await user?.save();
 
-      await redis.set(userId, JSON.stringify(shop));
+      await redis.set(userId, JSON.stringify(user));
 
-      res.status(200).json({ success: true, shop });
+      res.status(200).json({ success: true, user });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// update user address
+export const updateUserAddress = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+
+      const user = await UserModel.findById(userId);
+
+      const sameTypeAddress = user?.addresses.find(
+        (address) => address.addressType === req.body.addressType
+      );
+      if (sameTypeAddress) {
+        return next(
+          new ErrorHandler(
+            `${req.body.addressType} address already exists`,
+            400
+          )
+        );
+      }
+
+      const existsAddress = user?.addresses.find(
+        (address) => address._id === req.body._id
+      );
+
+      if (existsAddress) {
+        Object.assign(existsAddress, req.body);
+      } else {
+        // add the new address to the array
+        user?.addresses.push(req.body);
+      }
+
+      await user?.save();
+
+      await redis.set(userId, JSON.stringify(user));
+
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// update user address
+export const deleteUserAddress = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?._id;
+      const addressId = req.params.id;
+
+      await UserModel.updateOne(
+        {
+          _id: userId,
+        },
+        { $pull: { addresses: { _id: addressId } } }
+      );
+
+      const user = await UserModel.findById(userId);
+
+      await redis.del(userId);
+
+      await redis.set(userId, JSON.stringify(user));
+
+      res.status(200).json({ success: true, user });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -423,86 +457,47 @@ export const updateShopAvatar = catchAsyncError(
 );
 
 // get all users --- only for admin
-export const getAllShops = catchAsyncError(
+export const getAllUsers = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const shops = await ShopModel.find().sort({ created: -1 });
-      res.status(201).json({
-        success: true,
-        shops,
-      });
+      getAllUsersService(res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
 );
 
-//delete user ---only for admin
-export const deleteShop = catchAsyncError(
+// update user role --- only for admin
+export const updateUserRole = catchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id, role } = req.body;
+      updateUserRoleService(res, id, role);
+    } catch (error: any) {
+      return next(new ErrorHandler(error.message, 400));
+    }
+  }
+);
+
+// Delete user --- only for admin
+export const deleteUser = catchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { id } = req.params;
-      const shop = await ShopModel.findById(id);
-      if (!shop) {
-        return next(new ErrorHandler('Shop not found', 404));
+
+      const user = await UserModel.findById(id);
+
+      if (!user) {
+        return next(new ErrorHandler('User not found', 404));
       }
-      await shop.deleteOne({ id });
+
+      await user.deleteOne({ id });
+
       await redis.del(id);
-      res.status(200).json({
-        success: true,
-        message: 'Shop deleted successfully',
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
-    }
-  }
-);
 
-//update seller withdraw methods --- sellers
-export const updateWithdrawMethod = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // const { id } = req.params;
-      const userId = req.user?._id;
-      const { withdrawMethod } = req.body;
-      const shop = await ShopModel.findByIdAndUpdate(
-        userId,
-        { withdrawMethod },
-        {
-          new: true,
-        }
-      );
-
-      res.status(200).json({
-        success: true,
-        shop,
-      });
-    } catch (error: any) {
-      return next(new ErrorHandler(error.message, 400));
-    }
-  }
-);
-
-// delete seller withdraw methods --- only seller
-export const deleteWithdrawMethod = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userId = req.user?._id;
-
-      const shop = await ShopModel.findById(userId);
-
-      if (!shop) {
-        return next(new ErrorHandler('Shop not found with this id', 400));
-      }
-
-      shop.withdrawMethod = null;
-
-      await shop.save();
-
-      res.status(200).json({
-        success: true,
-        shop,
-      });
+      res
+        .status(200)
+        .json({ success: true, message: 'User deleted successfully' });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
