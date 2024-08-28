@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   activateUser,
+  createUser,
   deleteUser,
   deleteUserAddress,
   getAllUsers,
@@ -12,6 +13,7 @@ import {
   updatePassword,
   updateProfilePicture,
   updateUserAddress,
+  updateUserAvatar,
   updateUserInfo,
   updateUserRole,
 } from '../controllers/user';
@@ -20,34 +22,17 @@ import { validate, validateUser } from '../middleware/validator';
 
 const userRouter = express.Router();
 
-userRouter.post('/register', validateUser, validate, registerUser);
+userRouter.post('/register', validateUser, validate, createUser);
 userRouter.post('/activate-user', activateUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/logout', isAuthenticated, logoutUser);
-userRouter.get('/refresh', isAuthenticated, updateAccessToken);
 userRouter.get('/me', isAuthenticated, getUserInfo);
-userRouter.put(
-  '/update-user-info',
-  updateAccessToken,
-  isAuthenticated,
-  updateUserInfo
-);
-userRouter.put(
-  '/update-user-password',
-  updateAccessToken,
-  isAuthenticated,
-  updatePassword
-);
-userRouter.put(
-  '/update-user-avatar',
-  updateAccessToken,
-  isAuthenticated,
-  updateProfilePicture
-);
+userRouter.put('/update-user-info', isAuthenticated, updateUserInfo);
+userRouter.put('/update-user-password', isAuthenticated, updatePassword);
+userRouter.put('/update-user-avatar', isAuthenticated, updateUserAvatar);
 userRouter.put('/update-user-address', isAuthenticated, updateUserAddress);
 userRouter.delete(
   '/delete-user-address/:id',
-  updateAccessToken,
   isAuthenticated,
   deleteUserAddress
 );
@@ -59,7 +44,6 @@ userRouter.get(
 );
 userRouter.put(
   '/update-user-role',
-  updateAccessToken,
   isAuthenticated,
   authorizeRoles('admin'),
   updateUserRole
