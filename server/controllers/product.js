@@ -1,18 +1,17 @@
-import { NextFunction, Request, Response } from 'express';
 import { catchAsyncError } from '../middleware/catchAsyncErrors';
 import ErrorHandler from '../utils/ErrorHandler';
-import ShopModel from '../models/Shop';
+import Shop from '../models/Shop';
 import cloudinary from 'cloudinary';
-import ProductModel, { IReview } from '../models/Product';
-import OrderModel from '../models/Order';
+import Product from '../models/Product';
+import Order from '../models/Order';
 
 // create product
 export const createProduct = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req, res, next) => {
     try {
-      const shopId = req.body.shopId;
+      const {shopId} = req.body;
 
-      const shop = await ShopModel.findById(shopId);
+      const shop = await Shop.findById(shopId);
 
       if (!shop) {
         return next(new ErrorHandler('Shop Id is invalid', 400));
@@ -41,14 +40,14 @@ export const createProduct = catchAsyncError(
         productData.images = imagesLinks;
         productData.shop = shop;
 
-        const product = await ProductModel.create(productData);
+        const product = await Product.create(productData);
 
         res.status(201).json({
           success: true,
           product,
         });
       }
-    } catch (error: any) {
+    } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -56,11 +55,12 @@ export const createProduct = catchAsyncError(
 
 // get all products of a shop
 export const getAllProductsInShop = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req, res, next) => {
     try {
-      const products = await ProductModel.find({ shopId: req.params.id });
+      const {shopId} = req.params
+      const products = await Product.find({ shopId });
       res.status(201).json({ success: true, products });
-    } catch (error: any) {
+    } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -68,9 +68,10 @@ export const getAllProductsInShop = catchAsyncError(
 
 // delete product of a shop
 export const deleteProductInShop = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req, res, next) => {
     try {
-      const product = await ProductModel.findById(req.params.id);
+      const {productId} = req.params
+      const product = await Product.findById(productId);
 
       if (!product) {
         return next(new ErrorHandler('Product is not found with this id', 404));
@@ -88,7 +89,7 @@ export const deleteProductInShop = catchAsyncError(
         success: true,
         message: 'Product Deleted successfully!',
       });
-    } catch (error: any) {
+    } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -96,11 +97,11 @@ export const deleteProductInShop = catchAsyncError(
 
 // get all products -- seller
 export const getAllProducts = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req, res, next) => {
     try {
-      const products = await ProductModel.find().sort({ createdAt: -1 });
+      const products = await Product.find().sort({ createdAt: -1 });
       res.status(201).json({ success: true, products });
-    } catch (error: any) {
+    } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
@@ -108,32 +109,26 @@ export const getAllProducts = catchAsyncError(
 
 // review product
 export const reviewProduct = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req, res, next) => {
     try {
-      const { user, rating, comment, productId } = req.body as IReview;
+      const { user, rating, comment, productId, orderId } = req.body;
 
-      const product = await ProductModel.findById(productId);
+      const product = await Product.findById(productId);
 
       if (!product) {
         return next(new ErrorHandler('Product not found', 404));
       }
 
-      const review: any = {
+      const review = {
         user,
         rating,
         comment,
         productId,
       };
 
-      // const isReviewed = product.reviews.find(
-      //   (rev) => rev.user._id === req.user?._id
-      // );
-      const isReviewed = product.reviews.find((rev) => {
-        if (!rev.user) {
-          return next(new ErrorHandler('User not found', 404));
-        }
-        return rev.user._id === req.user?._id;
-      });
+      const isReviewed = product.reviews.find(
+        (rev) => rev.user._id === req.user?._id
+      );
 
       if (isReviewed) {
         product?.reviews.forEach((rev) => {
@@ -160,17 +155,17 @@ export const reviewProduct = catchAsyncError(
 
       await product.save();
 
-      // await OrderModel.findByIdAndUpdate(
-      //   orderId,
-      //   { $set: { 'cart.$[elem].isReviewed': true } },
-      //   { arrayFilters: [{ 'elem._id': productId }], new: true }
-      // );
+      await Order.findByIdAndUpdate(
+        orderId,
+        { $set: { 'cart.$[elem].isReviewed': true } },
+        { arrayFilters: [{ 'elem._id': productId }], new: true }
+      );
 
       res.status(200).json({
         success: true,
         message: 'Reviewed successfully!',
       });
-    } catch (error: any) {
+    } catch (error) {
       return next(new ErrorHandler(error.message, 400));
     }
   }
