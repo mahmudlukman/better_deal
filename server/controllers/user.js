@@ -318,6 +318,19 @@ export const deleteUserAddress = catchAsyncError(async (req, res, next) => {
   }
 });
 
+// find user information by Id
+export const getUserById = catchAsyncError(async (req, res, next) => {
+  try {
+    const {id} = req.params
+    const user = await User.findById(id);
+    res.status(201).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 400));
+  }
+});
 // get all users --- only for admin
 export const getAllUsers = catchAsyncError(async (req, res, next) => {
   try {

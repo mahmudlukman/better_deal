@@ -5,24 +5,21 @@ import {
   deleteUser,
   deleteUserAddress,
   getAllUsers,
+  getUserById,
   getUserInfo,
   loginUser,
   logoutUser,
-  registerUser,
-  updateAccessToken,
   updatePassword,
-  updateProfilePicture,
   updateUserAddress,
   updateUserAvatar,
   updateUserInfo,
   updateUserRole,
 } from '../controllers/user';
 import { authorizeRoles, isAuthenticated } from '../middleware/auth';
-import { validate, validateUser } from '../middleware/validator';
 
 const userRouter = express.Router();
 
-userRouter.post('/register', validateUser, validate, createUser);
+userRouter.post('/create-user', createUser);
 userRouter.post('/activate-user', activateUser);
 userRouter.post('/login', loginUser);
 userRouter.get('/logout', isAuthenticated, logoutUser);
@@ -35,6 +32,10 @@ userRouter.delete(
   '/delete-user-address/:id',
   isAuthenticated,
   deleteUserAddress
+);
+userRouter.get(
+  '/get-user/:id',
+  getUserById
 );
 userRouter.get(
   '/get-users',
