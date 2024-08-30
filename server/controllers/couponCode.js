@@ -27,7 +27,7 @@ export const createCouponCode = catchAsyncError(async (req, res, next) => {
 // get all coupons of a shop
 export const getCoupon = catchAsyncError(async (req, res, next) => {
   try {
-    const couponCodes = await CoupounCode.find({ shopId: req.seller.id });
+    const couponCodes = await CoupounCode.find({ shopId: req.seller?.id });
     res.status(201).json({
       success: true,
       couponCodes,

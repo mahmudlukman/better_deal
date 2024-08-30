@@ -138,8 +138,7 @@ export const logoutUser = catchAsyncError(async (req, res, next) => {
 // get user info
 export const getUserInfo = catchAsyncError(async (req, res, next) => {
   try {
-    const userId = req.user?._id;
-    const user = User.findById(userId);
+    const user = User.findById(req.user?._id);
     if (!user) {
       return next(new ErrorHandler("User doesn't exists", 400));
     }
@@ -188,13 +187,12 @@ export const updateUserInfo = catchAsyncError(async (req, res, next) => {
 export const updatePassword = catchAsyncError(async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const userId = req.user?._id;
 
     if (!oldPassword || !newPassword) {
       return next(new ErrorHandler('Please enter old and new password', 400));
     }
 
-    const user = await User.findById(userId).select('+password');
+    const user = await User.findById(req.user?._id).select('+password');
 
     if (user?.password === undefined) {
       return next(new ErrorHandler('Invalid user', 400));
@@ -221,9 +219,7 @@ export const updateUserAvatar = catchAsyncError(async (req, res, next) => {
   try {
     const { avatar } = req.body;
 
-    const userId = req.user?._id;
-
-    const user = await User.findById(userId);
+    const user = await User.findById(req.user?._id);
 
     if (avatar && user) {
       // if user have one avatar then call this if
@@ -262,9 +258,7 @@ export const updateUserAvatar = catchAsyncError(async (req, res, next) => {
 // update user address
 export const updateUserAddress = catchAsyncError(async (req, res, next) => {
   try {
-    const userId = req.user?._id;
-
-    const user = await User.findById(userId);
+    const user = await User.findById(req.user?._id);
 
     const sameTypeAddress = user?.addresses.find(
       (address) => address.addressType === req.body.addressType
@@ -321,8 +315,7 @@ export const deleteUserAddress = catchAsyncError(async (req, res, next) => {
 // find user information by Id
 export const getUserById = catchAsyncError(async (req, res, next) => {
   try {
-    const {id} = req.params
-    const user = await User.findById(id);
+    const user = await User.findById(req.params.id);
     res.status(201).json({
       success: true,
       user,
@@ -361,9 +354,7 @@ export const updateUserRole = catchAsyncError(async (req, res, next) => {
 // Delete user --- only for admin
 export const deleteUser = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    const user = await User.findById(id);
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return next(new ErrorHandler('User is not available with this id', 404));
@@ -373,7 +364,7 @@ export const deleteUser = catchAsyncError(async (req, res, next) => {
 
     await cloudinary.v2.uploader.destroy(imageId);
 
-    await user.deleteOne({ id });
+    await User.findByIdAndDelete(req.params.id);
 
     res.status(201).json({
       success: true,

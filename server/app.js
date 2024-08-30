@@ -4,10 +4,14 @@ export const app = express();
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorMiddleware } from './middleware/error.js';
-// import userRouter from './routes/user.route';
-// import shopRouter from './routes/shop.route';
-// import productRouter from './routes/product.route';
-// import orderRouter from './routes/order';
+import userRouter from './routes/user.route.js';
+import shopRouter from './routes/shop.route.js';
+import productRouter from './routes/product.route.js';
+import orderRouter from './routes/order.route.js';
+import messagesRouter from './routes/messages.route.js';
+import eventRouter from './routes/event.route.js';
+import conversationRouter from './routes/conversation.route.js';
+import couponCodeRouter from './routes/couponCode.route.js';
 
 import dotenv from 'dotenv'
 // require("dotenv").config();
@@ -29,10 +33,14 @@ app.use(
 );
 
 // routes
-// app.use('/api/v1', userRouter);
-// app.use('/api/v1', shopRouter);
-// app.use('/api/v1', productRouter);
-// app.use('/api/v1', orderRouter);
+app.use('/api/v1', userRouter);
+app.use('/api/v1', shopRouter);
+app.use('/api/v1', productRouter);
+app.use('/api/v1', orderRouter);
+app.use('/api/v1', messagesRouter);
+app.use('/api/v1', eventRouter);
+app.use('/api/v1', conversationRouter);
+app.use('/api/v1', couponCodeRouter);
 
 // testing API
 app.get('/test', (req, res, next) => {

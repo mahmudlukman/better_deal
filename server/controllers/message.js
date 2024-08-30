@@ -43,9 +43,8 @@ export const createNewMessage = catchAsyncError(async (req, res, next) => {
 // get all messages with conversation id
 export const getAllMessages = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
     const messages = await Messages.find({
-      conversationId: id,
+      conversationId: req.params.id,
     });
 
     res.status(201).json({

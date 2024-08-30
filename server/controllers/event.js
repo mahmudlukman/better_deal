@@ -65,8 +65,7 @@ export const getEvents = catchAsyncError(async (req, res, next) => {
 // get all events of a shop
 export const getShopEvents = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const events = await Event.find({ shopId: id });
+    const events = await Event.find({ shopId: req.params.id });
 
     res.status(201).json({
       success: true,
@@ -80,8 +79,7 @@ export const getShopEvents = catchAsyncError(async (req, res, next) => {
 // delete event of a shop
 export const deleteShopEvent = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const event = await Event.findById(id);
+    const event = await Event.findById(req.params.id);
 
     if (!product) {
       return next(new ErrorHandler('Product is not found with this id', 404));

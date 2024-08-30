@@ -44,9 +44,8 @@ export const createOrder = catchAsyncError(async (req, res, next) => {
 // get all orders of user
 export const getAllUserOrders = catchAsyncError(async (req, res, next) => {
   try {
-    const { userId } = req.params;
     const orders = await Order.find({
-      'user._id': userId,
+      'user._id': req.params.userId,
     }).sort({
       createdAt: -1,
     });
@@ -63,9 +62,8 @@ export const getAllUserOrders = catchAsyncError(async (req, res, next) => {
 // get all orders of seller
 export const getAllSellerOrders = catchAsyncError(async (req, res, next) => {
   try {
-    const { shopId } = req.params;
     const orders = await Order.find({
-      'cart.shopId': shopId,
+      'cart.shopId': req.params.shopId,
     }).sort({
       createdAt: -1,
     });
@@ -82,8 +80,7 @@ export const getAllSellerOrders = catchAsyncError(async (req, res, next) => {
 // update order status for seller
 export const updateOrderStatus = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const order = await Order.findById(id);
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return next(new ErrorHandler('Order not found with this id', 400));
@@ -134,8 +131,7 @@ export const updateOrderStatus = catchAsyncError(async (req, res, next) => {
 // give a refund ----- user
 export const orderRefundRequest = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const order = await Order.findById(id);
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return next(new ErrorHandler('Order not found with this id', 400));
@@ -158,8 +154,7 @@ export const orderRefundRequest = catchAsyncError(async (req, res, next) => {
 // accept the refund ---- seller
 export const orderRefundSuccess = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const order = await Order.findById(id);
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return next(new ErrorHandler('Order not found with this id', 400));

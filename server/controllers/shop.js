@@ -144,9 +144,7 @@ export const logoutShop = catchAsyncError(async (req, res, next) => {
 // get seller info
 export const getSeller = catchAsyncError(async (req, res, next) => {
   try {
-    const sellerId = req.seller?._id;
-
-    const seller = await Shop.findById(sellerId);
+    const seller = await Shop.findById(req.seller?._id);
 
     if (!seller) {
       return next(new ErrorHandler('Seller information not found', 400));
@@ -165,8 +163,7 @@ export const getSeller = catchAsyncError(async (req, res, next) => {
 export const updateSellerInfo = catchAsyncError(async (req, res, next) => {
   try {
     const { name, description, address, phoneNumber, zipCode } = req.body;
-    const sellerId = req.seller?._id;
-    const shop = await Shop.findById(sellerId);
+    const shop = await Shop.findById(req.seller?._id);
 
     if (name) shop.name = name;
     if (phoneNumber) shop.phoneNumber = phoneNumber;
@@ -185,9 +182,7 @@ export const updateSellerInfo = catchAsyncError(async (req, res, next) => {
 // get shop info
 export const getShopInfo = catchAsyncError(async (req, res, next) => {
   try {
-    const { id } = req.params;
-
-    const shop = await Shop.findById(id);
+    const shop = await Shop.findById(req.params.id);
 
     if (!shop) {
       return next(new ErrorHandler('Shop information not found', 400));
@@ -205,13 +200,12 @@ export const getShopInfo = catchAsyncError(async (req, res, next) => {
 export const updateShopPassword = catchAsyncError(async (req, res, next) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const sellerId = req.seller?._id;
 
     if (!oldPassword || !newPassword) {
       return next(new ErrorHandler('Please enter old and new password', 400));
     }
 
-    const shop = await Shop.findById(sellerId).select('+password');
+    const shop = await Shop.findById(req.seller?._id).select('+password');
 
     if (shop?.password === undefined) {
       return next(new ErrorHandler('Invalid shop', 400));
@@ -240,9 +234,7 @@ export const updateShopAvatar = catchAsyncError(async (req, res, next) => {
   try {
     const { avatar } = req.body;
 
-    const sellerId = req.seller?._id;
-
-    const shop = await Shop.findById(sellerId);
+    const shop = await Shop.findById(req.seller?._id);
 
     if (avatar && shop) {
       if (shop?.avatar?.public_id) {
@@ -318,12 +310,10 @@ export const deleteShop = catchAsyncError(async (req, res, next) => {
 //update seller withdraw methods --- sellers
 export const updateWithdrawMethod = catchAsyncError(async (req, res, next) => {
   try {
-    // const { id } = req.params;
-    const sellerId = req.seller?._id;
     const { withdrawMethod } = req.body;
 
     const shop = await Shop.findByIdAndUpdate(
-      sellerId,
+      req.seller?._id,
       { withdrawMethod },
       {
         new: true,
@@ -342,9 +332,7 @@ export const updateWithdrawMethod = catchAsyncError(async (req, res, next) => {
 // delete seller withdraw methods --- only seller
 export const deleteWithdrawMethod = catchAsyncError(async (req, res, next) => {
   try {
-    const sellerId = req.seller?._id;
-
-    const shop = await Shop.findById(sellerId);
+    const shop = await Shop.findById(req.seller?._id);
 
     if (!shop) {
       return next(new ErrorHandler('Shop not found with this id', 400));
