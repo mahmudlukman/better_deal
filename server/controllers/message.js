@@ -1,7 +1,6 @@
 import Messages from '../model/messages';
 import ErrorHandler from '../utils/ErrorHandler';
 import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import express from 'express';
 import cloudinary from 'cloudinary';
 
 // create new message

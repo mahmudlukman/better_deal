@@ -15,7 +15,7 @@ import {
   updateUserInfo,
   updateUserRole,
 } from '../controllers/user';
-import { authorizeRoles, isAuthenticated } from '../middleware/auth';
+import { isAdmin, isAuthenticated } from '../middleware/auth';
 
 const userRouter = express.Router();
 
@@ -40,20 +40,20 @@ userRouter.get(
 userRouter.get(
   '/get-users',
   isAuthenticated,
-  authorizeRoles('admin'),
+  isAdmin('admin'),
   getAllUsers
 );
 userRouter.put(
   '/update-user-role',
   isAuthenticated,
-  authorizeRoles('admin'),
+  isAdmin('admin'),
   updateUserRole
 );
 
 userRouter.delete(
   '/delete-user/:id',
   isAuthenticated,
-  authorizeRoles('admin'),
+  isAdmin('admin'),
   deleteUser
 );
 

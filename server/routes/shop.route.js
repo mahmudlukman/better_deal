@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeRoles, isAuthenticated } from '../middleware/auth';
+import { authorizeRoles, isAdmin, isAuthenticated, isSeller } from '../middleware/auth';
 import {
   activateShop,
   createShop,
@@ -7,73 +7,71 @@ import {
   deleteWithdrawMethod,
   getAllShops,
   getSeller,
+  getShopInfo,
   loginShop,
   logoutShop,
+  updateSellerInfo,
   updateShopAvatar,
   updateShopInfo,
   updateShopPassword,
   updateWithdrawMethod,
 } from '../controllers/shop';
-import { updateAccessToken } from '../controllers/user';
 
 const shopRouter = express.Router();
 
 shopRouter.post('/create-shop', createShop);
 shopRouter.post('/activate-shop', activateShop);
 shopRouter.post('/login-shop', loginShop);
+shopRouter.get('/seller', isSeller, getSeller);
 shopRouter.get(
   '/logout-shop',
   isAuthenticated,
-  authorizeRoles('seller'),
   logoutShop
 );
-shopRouter.get('/refresh-shop', updateAccessToken);
-shopRouter.get('/my-shop', isAuthenticated, getSeller);
+shopRouter.get(
+  '/shop-info/:id',
+  getShopInfo
+);
 shopRouter.put(
-  '/update-shop-info',
-  // updateAccessToken,
-  isAuthenticated,
-  updateShopInfo
+  '/update-seller-info',
+  isSeller,
+  updateSellerInfo
 );
 shopRouter.put(
   '/update-shop-password',
-  isAuthenticated,
+  isSeller,
   updateShopPassword
 );
 
 shopRouter.put(
   '/update-shop-avatar',
-  isAuthenticated,
+  isSeller,
   updateShopAvatar
 );
 
 shopRouter.get(
   '/get-shops',
   isAuthenticated,
-  authorizeRoles('admin'),
+  isAdmin('admin'),
   getAllShops
 );
 
 shopRouter.delete(
   '/delete-shop/:id',
   isAuthenticated,
-  authorizeRoles('admin'),
+  isAdmin('admin'),
   deleteShop
 );
 
 shopRouter.put(
   '/update-payment-methods',
-  // updateAccessToken,
-  isAuthenticated,
-  // authorizeRoles('seller'),
+  isSeller,
   updateWithdrawMethod
 );
 
 shopRouter.delete(
-  '/delete-withdraw-method/:id',
-  // updateAccessToken,
-  isAuthenticated,
-  // authorizeRoles('seller'),
+  '/delete-withdraw-method',
+  isSeller,
   deleteWithdrawMethod
 );
 
