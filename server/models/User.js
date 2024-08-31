@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -70,7 +73,7 @@ userSchema.pre('save', async function (next) {
     next();
   }
 
-  this.password = bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
 // jwt token

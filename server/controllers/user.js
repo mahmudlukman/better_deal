@@ -43,6 +43,7 @@ export const createUser = catchAsyncError(async (req, res, next) => {
       res.status(201).json({
         success: true,
         message: `please check your email:- ${user.email} to activate your account!`,
+        activationToken: activationToken,
       });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));

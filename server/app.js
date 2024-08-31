@@ -1,4 +1,3 @@
-// require('dotenv').config();
 import express from 'express';
 export const app = express();
 import cors from 'cors';
@@ -12,11 +11,10 @@ import messagesRouter from './routes/message.route.js';
 import eventRouter from './routes/event.route.js';
 import conversationRouter from './routes/conversation.route.js';
 import couponCodeRouter from './routes/couponCode.route.js';
+import dotenv from 'dotenv';
 
-import dotenv from 'dotenv'
-// require("dotenv").config();
 
-dotenv.config()
+dotenv.config();
 
 // body parser
 app.use(express.json({ limit: '50mb' }));
@@ -33,14 +31,17 @@ app.use(
 );
 
 // routes
-app.use('/api/v1', userRouter);
-app.use('/api/v1', shopRouter);
-app.use('/api/v1', productRouter);
-app.use('/api/v1', orderRouter);
-app.use('/api/v1', messagesRouter);
-app.use('/api/v1', eventRouter);
-app.use('/api/v1', conversationRouter);
-app.use('/api/v1', couponCodeRouter);
+app.use(
+  '/api/v1',
+  userRouter,
+  shopRouter,
+  productRouter,
+  orderRouter,
+  messagesRouter,
+  eventRouter,
+  conversationRouter,
+  couponCodeRouter
+);
 
 // testing API
 app.get('/test', (req, res, next) => {
