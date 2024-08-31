@@ -1,7 +1,7 @@
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import ErrorHandler from '../utils/ErrorHandler';
-import Order from '../models/Order';
-import Product from '../models/Product';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import Order from '../models/Order.js';
+import Product from '../models/Product.js';
 
 export const createOrder = catchAsyncError(async (req, res, next) => {
   try {

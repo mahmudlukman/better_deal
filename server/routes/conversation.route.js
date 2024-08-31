@@ -1,11 +1,11 @@
 import express from 'express';
-import { isAuthenticated, isSeller } from '../middleware/auth';
+import { isAuthenticated, isSeller } from '../middleware/auth.js';
 import {
   allUserConversations,
   createConversation,
   getAllConversations,
   updateLastMessage,
-} from '../controllers/conversation';
+} from '../controllers/conversation.js';
 
 const conversationRouter = express.Router();
 

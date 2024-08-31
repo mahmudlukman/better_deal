@@ -5,8 +5,8 @@ import {
   getAllEvents,
   getEvents,
   getShopEvents,
-} from '../controllers/event';
-import { isAdmin, isAuthenticated } from '../middleware/auth';
+} from '../controllers/event.js';
+import { isAdmin, isAuthenticated } from '../middleware/auth.js';
 
 const eventRouter = express.Router();
 

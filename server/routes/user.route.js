@@ -14,8 +14,8 @@ import {
   updateUserAvatar,
   updateUserInfo,
   updateUserRole,
-} from '../controllers/user';
-import { isAdmin, isAuthenticated } from '../middleware/auth';
+} from '../controllers/user.js';
+import { isAdmin, isAuthenticated } from '../middleware/auth.js';
 
 const userRouter = express.Router();
 

@@ -1,6 +1,6 @@
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import ErrorHandler from '../utils/ErrorHandler';
-import CoupounCode from '../model/coupounCode';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import CoupounCode from '../models/CouponCode.js';
 
 // create coupoun code
 export const createCouponCode = catchAsyncError(async (req, res, next) => {

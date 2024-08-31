@@ -1,6 +1,14 @@
 import express from 'express';
-import { authorizeRoles, isAdmin, isAuthenticated, isSeller } from '../middleware/auth';
-import { createOrder, getAllOrder, getAllSellerOrders, getAllUserOrders, orderRefundRequest, orderRefundSuccess, updateOrderStatus } from '../controllers/Order';
+import { isSeller, isAdmin } from '../middleware/auth.js';
+import {
+  createOrder,
+  getAllOrder,
+  getAllSellerOrders,
+  getAllUserOrders,
+  orderRefundRequest,
+  orderRefundSuccess,
+  updateOrderStatus,
+} from '../controllers/order.js';
 
 const orderRouter = express.Router();
 
@@ -10,6 +18,6 @@ orderRouter.get('/seller-orders/:shopId', getAllSellerOrders);
 orderRouter.put('/update-order-status/:id', isSeller, updateOrderStatus);
 orderRouter.put('/order-refund/:id', orderRefundRequest);
 orderRouter.put('/order-refund-success/:id', isSeller, orderRefundSuccess);
-orderRouter.get('/all-orders', isAdmin("admin"), getAllOrder);
+orderRouter.get('/all-orders', isAdmin('admin'), getAllOrder);
 
 export default orderRouter;

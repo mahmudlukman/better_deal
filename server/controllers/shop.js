@@ -1,10 +1,10 @@
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
 import jwt from 'jsonwebtoken';
-import Shop from '../models/Shop';
-import ErrorHandler from '../utils/ErrorHandler';
-import sendMail from '../utils/sendMail';
+import Shop from '../models/Shop.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import sendMail from '../utils/sendMail.js';
 import cloudinary from 'cloudinary';
-import sendShopToken from '../utils/shopToken';
+import sendShopToken from '../utils/shopToken.js';
 
 // create shop
 export const createShop = catchAsyncError(async (req, res, next) => {

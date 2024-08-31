@@ -1,5 +1,5 @@
 import express from 'express';
-import { authorizeRoles, isAdmin, isAuthenticated, isSeller } from '../middleware/auth';
+import { isAdmin, isAuthenticated, isSeller } from '../middleware/auth.js';
 import {
   activateShop,
   createShop,
@@ -12,10 +12,9 @@ import {
   logoutShop,
   updateSellerInfo,
   updateShopAvatar,
-  updateShopInfo,
   updateShopPassword,
   updateWithdrawMethod,
-} from '../controllers/shop';
+} from '../controllers/shop.js';
 
 const shopRouter = express.Router();
 

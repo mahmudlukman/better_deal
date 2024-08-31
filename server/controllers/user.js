@@ -1,10 +1,10 @@
 import jwt from 'jsonwebtoken';
-import sendMail from '../utils/sendMail';
-import sendToken from '../utils/jwtToken';
+import sendMail from '../utils/sendMail.js';
+import sendToken from '../utils/jwtToken.js';
 import cloudinary from 'cloudinary';
-import ErrorHandler from '../utils/ErrorHandler';
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import User from '../models/User';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
+import User from '../models/User.js';
 
 export const createUser = catchAsyncError(async (req, res, next) => {
   try {

@@ -1,6 +1,6 @@
 import express from 'express';
-import { isSeller } from '../middleware/auth';
-import { createCouponCode, deleteCoupon, getCoupon, getCouponValue } from '../controllers/couponCode';
+import { isSeller } from '../middleware/auth.js';
+import { createCouponCode, deleteCoupon, getCoupon, getCouponValue } from '../controllers/couponCode.js';
 
 const couponCodeRouter = express.Router();
 

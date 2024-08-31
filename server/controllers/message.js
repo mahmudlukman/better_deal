@@ -1,6 +1,6 @@
-import Messages from '../model/messages';
-import ErrorHandler from '../utils/ErrorHandler';
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
+import Messages from '../models/Message.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
 import cloudinary from 'cloudinary';
 
 // create new message
@@ -55,5 +55,3 @@ export const getAllMessages = catchAsyncError(async (req, res, next) => {
     return next(new ErrorHandler(error.message), 500);
   }
 });
-
-module.exports = router;

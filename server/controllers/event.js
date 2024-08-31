@@ -1,7 +1,7 @@
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import Shop from '../model/shop';
-import Event from '../model/event';
-import ErrorHandler from '../utils/ErrorHandler';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
+import Shop from '../models/Shop.js';
+import Event from '../models/Event.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
 import cloudinary from 'cloudinary';
 
 // create event

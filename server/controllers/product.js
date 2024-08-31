@@ -1,9 +1,9 @@
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
-import ErrorHandler from '../utils/ErrorHandler';
-import Shop from '../models/Shop';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import Shop from '../models/Shop.js';
 import cloudinary from 'cloudinary';
-import Product from '../models/Product';
-import Order from '../models/Order';
+import Product from '../models/Product.js';
+import Order from '../models/Order.js';
 
 // create product
 export const createProduct = catchAsyncError(async (req, res, next) => {

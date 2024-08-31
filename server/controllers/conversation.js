@@ -1,6 +1,6 @@
-import Conversation from '../models/Conversation';
-import ErrorHandler from '../utils/ErrorHandler';
-import { catchAsyncError } from '../middleware/catchAsyncErrors';
+import Conversation from '../models/Conversation.js';
+import ErrorHandler from '../utils/ErrorHandler.js';
+import { catchAsyncError } from '../middleware/catchAsyncErrors.js';
 
 // create a new conversation
 export const createConversation = catchAsyncError(async (req, res, next) => {

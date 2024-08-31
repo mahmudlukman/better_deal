@@ -8,7 +8,7 @@ import userRouter from './routes/user.route.js';
 import shopRouter from './routes/shop.route.js';
 import productRouter from './routes/product.route.js';
 import orderRouter from './routes/order.route.js';
-import messagesRouter from './routes/messages.route.js';
+import messagesRouter from './routes/message.route.js';
 import eventRouter from './routes/event.route.js';
 import conversationRouter from './routes/conversation.route.js';
 import couponCodeRouter from './routes/couponCode.route.js';
